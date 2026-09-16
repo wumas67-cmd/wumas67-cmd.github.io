@@ -3,64 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="一縷清香｜藥師佛藥香、檀香與肖楠香品">
-  <title>一縷清香｜天然香品與日常品香</title>
+  <meta name="description" content="澄香製所｜天然香品展示網站">
+  <title>澄香製所｜一縷香，一段安靜時光</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260916-4">
-  <link rel="stylesheet" href="smoke.css?v=20260916-4">
-  <link rel="stylesheet" href="motion.css?v=20260916-4">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="announcement">全館滿 NT$1,200 免運｜展示網站・不會產生真實訂單</div>
   <header class="site-header" id="top">
-    <a class="brand" href="#top" aria-label="一縷清香首頁"><span class="brand-mark">香</span><span><strong>一縷清香</strong><small>YILU INCENSE</small></span></a>
-    <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="mainNav">選單</button>
-    <nav id="mainNav" aria-label="主要選單"><a href="#story">品牌故事</a><a href="#products">香品選物</a><a href="#guide">品香指南</a></nav>
-    <button class="cart-button" id="openCart" type="button" aria-label="開啟購物車">購物車 <span id="cartCount">0</span></button>
+    <a class="brand" href="#top" aria-label="澄香製所首頁">
+      <span class="brand-mark">澄</span>
+      <span><strong>澄香製所</strong><small>CHENGXIANG INCENSE</small></span>
+    </a>
+    <nav aria-label="主要選單">
+      <a href="#story">品牌故事</a>
+      <a href="#products">香品選物</a>
+      <a href="#guide">選香指南</a>
+    </nav>
+    <button class="cart-button" id="openCart" type="button" aria-label="開啟購物車">
+      購物車 <span id="cartCount">0</span>
+    </button>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-copy reveal">
-        <p class="eyebrow">NATURAL INCENSE · TAIWAN</p>
-        <h1>一縷清香，<br>讓日子慢下來。</h1>
-        <p class="hero-intro">從藥師佛藥香、檀香到台灣肖楠，選擇各有風格的香氣。閱讀、茶席、靜坐或夜晚休息，都能找到一款適合此刻的香。</p>
-        <div class="hero-actions"><a class="primary-button" href="#products">開始選香</a><a class="text-link" href="#story">認識一縷清香 <span>→</span></a></div>
-        <div class="hero-proof"><span>香品選物</span><span>小批製作</span><span>台灣選香</span></div>
+        <p class="eyebrow">HANDCRAFTED IN TAIWAN</p>
+        <h1>一縷香，<br>一段安靜時光。</h1>
+        <p class="hero-intro">選用天然香材，保留木質最純粹的氣息。讓日常在緩慢升起的香煙裡，重新找到呼吸的節奏。</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#products">探索香品</a>
+          <a class="text-link" href="#story">閱讀製香故事 <span>→</span></a>
+        </div>
       </div>
-      <div class="hero-art reveal" aria-label="山林、日輪與三支線香裊裊升煙的意象">
-        <div class="motion-glow" aria-hidden="true"></div><div class="sun"></div>
-        <svg class="mountains" viewBox="0 0 800 560" aria-hidden="true"><path d="M0 430 C130 330,210 350,320 240 C420 140,500 330,610 240 C700 170,750 220,800 180 L800 560 L0 560Z" fill="#9d9b83" opacity=".35"/><path d="M0 460 C150 390,230 420,350 340 C500 240,560 390,800 270 L800 560 L0 560Z" fill="#5f6a58" opacity=".45"/><path d="M0 500 C180 440,320 490,470 410 C610 335,680 430,800 370 L800 560 L0 560Z" fill="#24372f" opacity=".82"/></svg>
-        <div class="incense-holder" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="smoke-stage" aria-hidden="true"><span class="smoke-plume smoke-plume-one"></span><span class="smoke-plume smoke-plume-two"></span><span class="smoke-plume smoke-plume-three"></span></div>
-        <p class="vertical-note">聞香・靜心・日常</p>
+      <div class="hero-art reveal" aria-label="線香與山嵐意象插畫">
+        <div class="sun"></div>
+        <svg class="mountains" viewBox="0 0 800 560" role="img" aria-hidden="true">
+          <path d="M0 430 C130 330, 210 350, 320 240 C420 140, 500 330, 610 240 C700 170, 750 220, 800 180 L800 560 L0 560Z" fill="#9d9b83" opacity=".35"/>
+          <path d="M0 460 C150 390, 230 420, 350 340 C500 240, 560 390, 800 270 L800 560 L0 560Z" fill="#5f6a58" opacity=".45"/>
+          <path d="M0 500 C180 440, 320 490, 470 410 C610 335, 680 430, 800 370 L800 560 L0 560Z" fill="#24372f" opacity=".82"/>
+        </svg>
+        <div class="incense-holder"><i></i><i></i><i></i></div>
+        <div class="smoke smoke-one"></div>
+        <div class="smoke smoke-two"></div>
+        <p class="vertical-note">天然・手作・慢生活</p>
       </div>
-      <div class="hero-scroll-cue" aria-hidden="true"><span>SCROLL</span><i></i></div>
     </section>
 
-    <section class="trust-row" aria-label="品牌特色"><div><span>香</span><p><strong>特色香品</strong><small>各有風格與香韻</small></p></div><div><span>手</span><p><strong>小批製作</strong><small>專注每一批香氣穩定</small></p></div><div><span>靜</span><p><strong>日常好聞</strong><small>不追求濃烈，耐聞舒服</small></p></div></section>
+    <section class="trust-row" aria-label="品牌特色">
+      <div><span>木</span><p><strong>天然香材</strong><small>嚴選來源與氣韻</small></p></div>
+      <div><span>手</span><p><strong>職人手作</strong><small>小批製作細緻品管</small></p></div>
+      <div><span>心</span><p><strong>安心品香</strong><small>成分透明簡單純粹</small></p></div>
+    </section>
 
-    <section class="story section" id="story"><div class="story-image reveal"><div class="story-seal">一縷<br><small>清香</small></div></div><div class="story-copy reveal"><p class="eyebrow">OUR STORY</p><h2>香，不只是氣味。<br>也是一段留給自己的時間。</h2><p>一縷清香希望把品香帶回日常。不需要繁複儀式，只需要一個舒服的空間、一點通風，以及願意慢下來的幾分鐘。</p><p>我們以藥香、檀香、肖楠等不同香韻為選物方向，呈現各自鮮明而耐聞的氣息，讓每一款香都有適合自己的生活場景。</p><a class="text-link" href="#products">挑選適合你的香 <span>→</span></a></div></section>
+    <section class="story section" id="story">
+      <div class="story-image reveal">
+        <div class="story-seal">香<br><small>養心</small></div>
+      </div>
+      <div class="story-copy reveal">
+        <p class="eyebrow">OUR STORY</p>
+        <h2>讓香，回到生活本來的位置</h2>
+        <p>我們相信，好香不必濃烈。從選材、研磨到陰乾，每一道工序都順著香材原本的性格，留下沉穩、乾淨而耐聞的氣息。</p>
+        <p>無論閱讀、靜坐、茶席，或只是結束忙碌的一天，都能點一縷適合自己的香。</p>
+        <div class="signature">澄香製所&nbsp;&nbsp;謹製</div>
+      </div>
+    </section>
 
-    <section class="products section" id="products"><div class="section-heading reveal"><div><p class="eyebrow">SELECTED INCENSE</p><h2>三款日常代表香</h2></div><p>從藥師佛藥香的古藥房香氣、溫潤檀香到清冽肖楠，依照空間與心情選擇。</p></div><div class="product-grid" id="productGrid"></div></section>
+    <section class="products section" id="products">
+      <div class="section-heading reveal">
+        <div><p class="eyebrow">SELECTED INCENSE</p><h2>本月香品選物</h2></div>
+        <p>三款代表香氣，從清雅到深沉，找到此刻最適合您的陪伴。</p>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
 
-    <section class="scent-finder section"><div class="finder-intro reveal"><p class="eyebrow">FIND YOUR SCENT</p><h2>不知道怎麼選？<br>先從使用情境開始。</h2></div><div class="finder-grid reveal"><a href="product.html?id=2"><span>01</span><strong>閱讀・工作</strong><small>柔和溫潤，不搶注意力</small></a><a href="product.html?id=1"><span>02</span><strong>藥香・靜心</strong><small>古藥房風格的藥香氣息</small></a><a href="product.html?id=3"><span>03</span><strong>雨天・夜晚</strong><small>森林清氣，空間感更明亮</small></a></div></section>
+    <section class="ritual section" id="guide">
+      <div class="ritual-copy reveal">
+        <p class="eyebrow">A QUIET RITUAL</p>
+        <h2>每天，留十分鐘給自己</h2>
+        <p>打開一扇窗、點一炷香，不追求儀式，只感受香氣從明亮到沉靜的變化。</p>
+      </div>
+      <ol class="ritual-steps reveal">
+        <li><span>01</span><strong>選一款香</strong><small>依照空間與當下心情</small></li>
+        <li><span>02</span><strong>輕點香頭</strong><small>待火苗穩定後輕扇熄滅</small></li>
+        <li><span>03</span><strong>保持通風</strong><small>在淡淡香氣中自在呼吸</small></li>
+      </ol>
+    </section>
 
-    <section class="ritual section" id="guide"><div class="ritual-copy reveal"><p class="eyebrow">A QUIET RITUAL</p><h2>三步驟，開始一段舒服的品香時間。</h2><p>好香不必點很多。保持通風、控制時間，讓香氣自然存在於空間裡。</p></div><ol class="ritual-steps reveal"><li><span>01</span><strong>選一款香</strong><small>依照空間、時間與當下心情</small></li><li><span>02</span><strong>輕點香頭</strong><small>待火苗穩定後輕扇熄滅</small></li><li><span>03</span><strong>保持通風</strong><small>不追求濃度，留一點空氣感</small></li></ol></section>
-
-    <section class="newsletter section reveal"><p class="eyebrow">SCENT LETTER</p><h2>訂閱香氣手札</h2><p>不定期分享品香知識、新品消息與日常選香提案。</p><form id="newsletterForm"><label class="sr-only" for="email">電子信箱</label><input id="email" type="email" placeholder="您的電子信箱" required><button type="submit">訂閱</button></form><span class="form-message" id="formMessage" aria-live="polite"></span></section>
+    <section class="newsletter section reveal">
+      <p class="eyebrow">SCENT LETTER</p>
+      <h2>訂閱香氣手札</h2>
+      <p>不定期分享品香知識、新品消息與生活提案。</p>
+      <form id="newsletterForm">
+        <label class="sr-only" for="email">電子信箱</label>
+        <input id="email" type="email" placeholder="您的電子信箱" required>
+        <button type="submit">訂閱</button>
+      </form>
+      <span class="form-message" id="formMessage" aria-live="polite"></span>
+    </section>
   </main>
 
-  <footer><div class="brand footer-brand"><span class="brand-mark">香</span><span><strong>一縷清香</strong><small>YILU INCENSE</small></span></div><div><strong>快速連結</strong><a href="#products">香品選物</a><a href="#story">品牌故事</a><a href="#guide">品香指南</a></div><div><strong>購物提醒</strong><p>目前為網站功能展示</p><p>尚未連接真實金流與訂單系統</p></div><p class="copyright">© 2026 一縷清香｜香品展示網站</p></footer>
+  <footer>
+    <div class="brand footer-brand"><span class="brand-mark">澄</span><span><strong>澄香製所</strong><small>CHENGXIANG INCENSE</small></span></div>
+    <div><strong>顧客服務</strong><a href="#">配送說明</a><a href="#">退換貨政策</a><a href="#">聯絡我們</a></div>
+    <div><strong>營業資訊</strong><p>週一至週五 10:00–18:00</p><p>service@example.com</p></div>
+    <p class="copyright">© 2026 澄香製所｜本網站為展示樣板</p>
+  </footer>
 
   <div class="overlay" id="overlay" hidden></div>
-  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-labelledby="cartTitle"><div class="drawer-header"><h2 id="cartTitle">您的購物車</h2><button id="closeCart" type="button" aria-label="關閉購物車">×</button></div><div class="shipping-progress"><p id="shippingMessage">再選購一些，即享滿額免運。</p><div><i id="shippingBar"></i></div></div><div class="cart-items" id="cartItems"></div><div class="cart-empty" id="cartEmpty"><span>香</span><p>購物車目前是空的</p><a href="#products" id="continueShopping">開始選香</a></div><div class="cart-summary" id="cartSummary" hidden><div><span>小計</span><strong id="cartTotal">NT$0</strong></div><p>展示網站不會建立真實訂單。</p><button type="button" id="checkoutButton">模擬結帳</button></div></aside>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-labelledby="cartTitle">
+    <div class="drawer-header"><h2 id="cartTitle">您的購物車</h2><button id="closeCart" type="button" aria-label="關閉購物車">×</button></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty"><span>香</span><p>購物車目前是空的</p><a href="#products" id="continueShopping">開始選香</a></div>
+    <div class="cart-summary" id="cartSummary" hidden>
+      <div><span>小計</span><strong id="cartTotal">NT$0</strong></div>
+      <p>運費與折扣將於下一步計算</p>
+      <button type="button" id="checkoutButton">前往模擬結帳</button>
+    </div>
+  </aside>
 
-  <script src="app.js?v=20260916-4"></script>
-  <script src="product-fix.js?v=20260916-4"></script>
-  <script src="gsap-loader.js?v=20260916-4"></script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js?v=20260916-5"></script>
+  <script src="product-fix.js?v=20260916-5"></script>
 </body>
 </html>
