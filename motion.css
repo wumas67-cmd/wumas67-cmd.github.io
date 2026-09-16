@@ -1,0 +1,157 @@
+/* GSAP-enhanced motion layer for 一縷清香 */
+html.gsap-ready .hero-copy > *,
+html.gsap-ready .hero-art .sun,
+html.gsap-ready .hero-art .mountains,
+html.gsap-ready .hero-art .incense-holder,
+html.gsap-ready .hero-art .vertical-note,
+html.gsap-ready .hero-scroll-cue {
+  will-change: transform, opacity;
+}
+
+.hero {
+  position: relative;
+}
+
+.hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 72% 24%, rgba(255,255,255,.18), transparent 26%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(20,34,27,.08));
+}
+
+.hero-art .sun,
+.hero-art .mountains,
+.hero-art .incense-holder,
+.hero-art .smoke-stage,
+.hero-art .vertical-note {
+  z-index: 2;
+}
+
+.hero-art .mountains {
+  will-change: transform;
+}
+
+.hero-scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  z-index: 8;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  color: rgba(32,49,40,.72);
+  font-size: 9px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-scroll-cue i {
+  display: block;
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(to bottom, rgba(32,49,40,.6), transparent);
+  transform-origin: top;
+}
+
+.site-header.motion-scrolled {
+  box-shadow: 0 10px 30px rgba(28,43,35,.06);
+}
+
+.product-card,
+.finder-grid a,
+.ritual-steps li,
+.story-image,
+.story-copy,
+.section-heading,
+.finder-intro,
+.newsletter {
+  transform-origin: 50% 50%;
+}
+
+.product-card {
+  backface-visibility: hidden;
+}
+
+.product-card .product-visual,
+.story-image {
+  overflow: hidden;
+}
+
+.product-card .product-box {
+  will-change: transform;
+}
+
+.finder-grid a {
+  transition: background-color .3s ease, padding-left .3s ease;
+}
+
+.finder-grid a:hover {
+  padding-left: 12px;
+  background: rgba(48,72,59,.035);
+}
+
+.finder-grid a strong,
+.finder-grid a small,
+.finder-grid a span {
+  transition: transform .3s ease, color .3s ease;
+}
+
+.finder-grid a:hover span {
+  transform: translateX(4px);
+}
+
+.primary-button,
+.cart-button,
+.add-button,
+.detail-buy button {
+  transform-origin: 50% 50%;
+}
+
+.motion-glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  right: 8%;
+  top: 18%;
+  z-index: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(216,163,110,.18), transparent 70%);
+  filter: blur(10px);
+}
+
+@media (max-width: 850px) {
+  .hero-scroll-cue { display: none; }
+  .motion-glow { width: 220px; height: 220px; right: -30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.gsap-ready .hero-copy > *,
+  html.gsap-ready .hero-art .sun,
+  html.gsap-ready .hero-art .mountains,
+  html.gsap-ready .hero-art .incense-holder,
+  html.gsap-ready .hero-art .vertical-note,
+  html.gsap-ready .hero-scroll-cue,
+  .product-card,
+  .finder-grid a,
+  .ritual-steps li,
+  .story-image,
+  .story-copy,
+  .section-heading,
+  .finder-intro,
+  .newsletter {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .motion-glow,
+  .hero-scroll-cue { display: none; }
+}
