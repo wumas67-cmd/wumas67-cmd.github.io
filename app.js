@@ -1,6 +1,6 @@
 const products = [
   { id: 1, name: "藥師佛藥香2H", type: "MEDICINE BUDDHA INCENSE", note: "古藥房的藥香味道・2H盤香", price: 350, badge: "藥師香", bg: "#e8e1d1", box: "#eee9dc", ink: "#26362e", url: "product.html?id=1", image: "images/medicine-buddha-incense.jpg?v=20260916-7" },
-  { id: 2, name: "月白檀香", type: "CALMING INCENSE", note: "老山檀・柔和奶香・溫潤", price: 520, badge: "初次推薦", bg: "#dad6c8", box: "#f7f2e6", ink: "#7b4a37" },
+  { id: 2, name: "拙具羅(7寸線/盒)", type: "DHARMA PROTECTOR INCENSE", note: "供護法・清淨莊嚴壇城", price: 600, badge: "供護法", bg: "#dad6c8", box: "#f7f2e6", ink: "#7b4a37", url: "product.html?id=2", image: "images/zhujuluo-incense-01.jpg?v=20260916-10" },
   { id: 3, name: "山嵐肖楠", type: "FOREST INCENSE", note: "肖楠・森林苔蘚・清冽", price: 580, badge: "台灣香材", bg: "#abb2a1", box: "#d8d8c8", ink: "#23382e" }
 ];
 
