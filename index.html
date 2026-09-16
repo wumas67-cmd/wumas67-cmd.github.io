@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="smoke.css">
+  <link rel="stylesheet" href="motion.css">
 </head>
 <body>
   <div class="announcement">全館滿 NT$1,200 免運｜展示網站・不會產生真實訂單</div>
@@ -40,6 +41,7 @@
         <div class="hero-proof"><span>天然香材</span><span>小批製作</span><span>台灣選香</span></div>
       </div>
       <div class="hero-art reveal" aria-label="山林、日輪與三支線香裊裊升煙的意象">
+        <div class="motion-glow" aria-hidden="true"></div>
         <div class="sun"></div>
         <svg class="mountains" viewBox="0 0 800 560" aria-hidden="true">
           <path d="M0 430 C130 330,210 350,320 240 C420 140,500 330,610 240 C700 170,750 220,800 180 L800 560 L0 560Z" fill="#9d9b83" opacity=".35"/>
@@ -54,6 +56,7 @@
         </div>
         <p class="vertical-note">聞香・靜心・日常</p>
       </div>
+      <div class="hero-scroll-cue" aria-hidden="true"><span>SCROLL</span><i></i></div>
     </section>
 
     <section class="trust-row" aria-label="品牌特色">
@@ -122,6 +125,10 @@
     <div class="cart-summary" id="cartSummary" hidden><div><span>小計</span><strong id="cartTotal">NT$0</strong></div><p>展示網站不會建立真實訂單。</p><button type="button" id="checkoutButton">模擬結帳</button></div>
   </aside>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <script src="app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script src="motion.js"></script>
 </body>
 </html>
