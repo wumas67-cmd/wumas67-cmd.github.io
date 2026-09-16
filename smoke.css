@@ -1,0 +1,148 @@
+/* Homepage incense smoke enhancement — lightweight CSS only */
+.smoke-stage {
+  position: absolute;
+  right: 24%;
+  bottom: 204px;
+  width: 148px;
+  height: 330px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.smoke-plume {
+  --smoke-delay: 0s;
+  --smoke-drift: 18px;
+  width: 70px;
+  height: 300px;
+  position: absolute;
+  bottom: 0;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation: incenseSmoke 7.2s ease-in-out infinite;
+  animation-delay: var(--smoke-delay);
+  filter: blur(.35px);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.9) 18%, rgba(0,0,0,.6) 55%, transparent 100%);
+  mask-image: linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.9) 18%, rgba(0,0,0,.6) 55%, transparent 100%);
+}
+
+.smoke-plume::before,
+.smoke-plume::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-left: 2px solid rgba(255,255,255,.68);
+  border-radius: 52% 46% 58% 42%;
+  transform-origin: 50% 100%;
+}
+
+.smoke-plume::before {
+  transform: translateX(20px) rotate(-7deg) scaleX(.72);
+  opacity: .72;
+  filter: blur(1.2px);
+  animation: smokeRibbonA 4.6s ease-in-out infinite alternate;
+}
+
+.smoke-plume::after {
+  height: 84%;
+  top: 9%;
+  transform: translateX(36px) rotate(10deg) scaleX(.55);
+  border-left-width: 1.5px;
+  opacity: .48;
+  filter: blur(2px);
+  animation: smokeRibbonB 5.4s ease-in-out infinite alternate;
+}
+
+.smoke-plume-one {
+  left: 17px;
+  --smoke-delay: -1.1s;
+  --smoke-drift: -14px;
+}
+
+.smoke-plume-two {
+  left: 38px;
+  --smoke-delay: -3.7s;
+  --smoke-drift: 18px;
+  animation-duration: 7.8s;
+}
+
+.smoke-plume-three {
+  left: 59px;
+  --smoke-delay: -5.4s;
+  --smoke-drift: 28px;
+  animation-duration: 8.4s;
+}
+
+/* Tiny glowing ember at each incense tip */
+.incense-holder i::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #d87345;
+  box-shadow: 0 0 6px rgba(216,115,69,.9), 0 0 14px rgba(216,115,69,.48);
+  animation: emberPulse 2.4s ease-in-out infinite alternate;
+}
+
+.incense-holder i:nth-child(2)::before { animation-delay: -.8s; }
+.incense-holder i:nth-child(3)::before { animation-delay: -1.6s; }
+
+@keyframes incenseSmoke {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(.72, .5) rotate(-4deg);
+  }
+  12% { opacity: .72; }
+  48% {
+    opacity: .58;
+    transform: translate3d(calc(var(--smoke-drift) * .45), -62px, 0) scale(.95, .9) rotate(5deg);
+  }
+  78% { opacity: .3; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--smoke-drift), -150px, 0) scale(1.45, 1.2) rotate(-7deg);
+  }
+}
+
+@keyframes smokeRibbonA {
+  0% { transform: translateX(17px) rotate(-9deg) scaleX(.65); }
+  45% { transform: translateX(31px) rotate(7deg) scaleX(.9); }
+  100% { transform: translateX(9px) rotate(-2deg) scaleX(.75); }
+}
+
+@keyframes smokeRibbonB {
+  0% { transform: translateX(38px) rotate(12deg) scaleX(.5); }
+  50% { transform: translateX(17px) rotate(-10deg) scaleX(.72); }
+  100% { transform: translateX(42px) rotate(5deg) scaleX(.58); }
+}
+
+@keyframes emberPulse {
+  from { opacity: .65; transform: translate(-50%, -50%) scale(.8); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+}
+
+@media (max-width: 760px) {
+  .smoke-stage {
+    right: 24%;
+    height: 270px;
+    bottom: 204px;
+    transform: scale(.84);
+    transform-origin: 50% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smoke-plume,
+  .smoke-plume::before,
+  .smoke-plume::after,
+  .incense-holder i::before {
+    animation: none;
+  }
+  .smoke-plume {
+    opacity: .35;
+    transform: translateY(-35px);
+  }
+}
