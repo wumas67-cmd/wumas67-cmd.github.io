@@ -52,7 +52,7 @@
     const id = Number(new URLSearchParams(location.search).get('id')) || 1;
     if (id !== 1) return;
 
-    document.title = '藥師佛藥香2H｜一縷清香';
+    document.title = '藥師佛藥香2H｜禪修林都是好香';
     mount.innerHTML = `
       <div class="detail-visual">${productImage(true)}</div>
       <div class="detail-copy">
