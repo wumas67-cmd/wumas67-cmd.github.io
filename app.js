@@ -82,7 +82,7 @@ document.addEventListener("click", event => {
     const id = add.dataset.add;
     cart[id] = (cart[id] || 0) + 1;
     saveCart(); renderCart();
-    showToast("已加入購物袋");
+    showToast("已加入購物車");
   }
   if (change) {
     const id = change.dataset.change;
