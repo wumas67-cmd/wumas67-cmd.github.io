@@ -16,10 +16,10 @@
   function productImage(compact = false) {
     const imageSrc = product.image.startsWith('data:')
       ? product.image
-      : `${product.image}?v=20260916-5`;
+      : `${product.image}?v=20260916-6`;
     return `<div class="product-visual${compact ? ' compact' : ''}" style="background:#e8e1d1">
       <span class="product-badge">藥師香</span>
-      <img class="medicine-buddha-photo" src="${imageSrc}" alt="藥師佛藥香2H產品實物照片" style="width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1">
+      <img class="medicine-buddha-photo" src="${imageSrc}" alt="藥師佛藥香2H產品實物照片">
     </div>`;
   }
 
@@ -78,7 +78,7 @@
 
   async function loadBase64Image() {
     try {
-      const response = await fetch('images/medicine-buddha-incense.base64.txt?v=20260916-5');
+      const response = await fetch('images/medicine-buddha-incense.base64.txt?v=20260916-6');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const dataUrl = (await response.text()).trim();
       if (!dataUrl.startsWith('data:image/jpeg;base64,')) {

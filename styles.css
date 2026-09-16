@@ -85,6 +85,25 @@ h2 { font-size: clamp(30px, 4vw, 46px); line-height: 1.45; letter-spacing: .07em
 .product-badge { position: absolute; left: 18px; top: 18px; z-index: 2; padding: 6px 10px; color: white; background: var(--rust); font-size: 10px; letter-spacing: .15em; }
 .product-info { padding: 25px; }.product-meta { color: #8b8e87; font-size: 10px; letter-spacing: .16em; }.product-info h3 { margin: 9px 0; font-family: var(--serif); font-size: 22px; letter-spacing: .08em; }.product-info p { min-height: 48px; color: #6f766f; font-size: 13px; line-height: 1.8; }.product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }.product-footer strong { font-family: var(--serif); }.add-button { width: 42px; height: 42px; color: white; background: var(--ink); border: 0; border-radius: 50%; cursor: pointer; font-size: 23px; transition: .2s; }.add-button:hover { background: var(--rust); transform: rotate(90deg); }
 
+.product-detail { width: min(1180px, calc(100% - 44px)); margin: 0 auto; padding: clamp(56px, 7vw, 96px) 0; display: grid; grid-template-columns: minmax(320px, 500px) minmax(0, 1fr); align-items: center; gap: clamp(42px, 7vw, 90px); }
+.detail-visual { min-width: 0; }
+.detail-visual .product-visual.compact { width: 100%; height: auto; aspect-ratio: 4 / 5; max-height: 600px; background: #e8e1d1; }
+.product-detail .medicine-buddha-photo { width: 100%; height: 100%; display: block; position: relative; z-index: 1; object-fit: contain; }
+.detail-copy { min-width: 0; }
+.detail-copy h1 { font-size: clamp(38px, 5vw, 64px); }
+.detail-breadcrumb, .detail-note-line, .detail-description, .detail-list, .detail-demo { color: #5e6862; line-height: 1.85; }
+.detail-breadcrumb { margin: 0 0 24px; font-size: 13px; }
+.detail-note-line { margin: 24px 0 10px; font-family: var(--serif); font-size: 18px; }
+.detail-description { max-width: 620px; }
+.detail-list { padding-left: 1.25em; }
+.detail-buy { margin: 28px 0 20px; display: flex; align-items: center; gap: 24px; }
+.detail-buy strong { font: 28px var(--serif); }
+.detail-buy button { padding: 13px 28px; border: 0; color: white; background: var(--ink); cursor: pointer; }
+.compact-section { display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; }
+.detail-note-grid p { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.detail-note-grid strong, .detail-note-grid span { display: block; }
+.detail-note-grid span { margin-top: 7px; color: #69726d; }
+
 .ritual { color: #f4f0e5; background: var(--pine); }
 .ritual { display: grid; grid-template-columns: .8fr 1.2fr; gap: 9vw; align-items: center; }
 .ritual-copy p:not(.eyebrow) { max-width: 440px; color: #cbd2cc; line-height: 2; }
@@ -108,6 +127,9 @@ footer > div:not(.brand) strong, footer a, footer p { display: block; margin: 0 
   .trust-row { grid-template-columns: 1fr; }.trust-row > div { justify-content: flex-start; padding-left: 15vw; border-right: 0; border-bottom: 1px solid var(--line); }
   .section { padding: 85px 7vw; }.story, .ritual { grid-template-columns: 1fr; }.story-image { min-height: 420px; }.story { gap: 60px; }
   .section-heading { align-items: start; flex-direction: column; }.product-grid { grid-template-columns: 1fr; }.product-visual { height: 340px; }.ritual { gap: 55px; }
+  .product-detail { width: min(100% - 30px, 620px); padding: 42px 0 70px; grid-template-columns: 1fr; gap: 36px; }
+  .detail-visual .product-visual.compact { height: auto; max-height: 520px; }
+  .compact-section { grid-template-columns: 1fr; }
   footer { grid-template-columns: 1fr; }.copyright { grid-column: 1; }
 }
 
