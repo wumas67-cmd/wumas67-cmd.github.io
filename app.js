@@ -1,5 +1,5 @@
 const products = [
-  { id: 1, name: "雲水沉香", type: "DAILY INCENSE", note: "沉香・雪松・微甜木質", price: 680, badge: "人氣選物", bg: "#c9c2ae", box: "#eee9dc", ink: "#26362e" },
+  { id: 1, name: "藥師佛藥香2H", type: "MEDICINE BUDDHA INCENSE", note: "古藥房的藥香味道・2H盤香", price: 350, badge: "藥師香", bg: "#e8e1d1", box: "#eee9dc", ink: "#26362e", url: "product.html?id=1", image: "images/medicine-buddha-incense.jpg?v=20260916-7" },
   { id: 2, name: "月白檀香", type: "CALMING INCENSE", note: "老山檀・柔和奶香・溫潤", price: 520, badge: "初次推薦", bg: "#dad6c8", box: "#f7f2e6", ink: "#7b4a37" },
   { id: 3, name: "山嵐肖楠", type: "FOREST INCENSE", note: "肖楠・森林苔蘚・清冽", price: 580, badge: "台灣香材", bg: "#abb2a1", box: "#d8d8c8", ink: "#23382e" }
 ];
@@ -10,7 +10,7 @@ const productGrid = $("#productGrid");
 
 const money = (value) => `NT$${value.toLocaleString("zh-TW")}`;
 
-productGrid.innerHTML = products.map(product => `
+if (productGrid) productGrid.innerHTML = products.map(product => `
   <article class="product-card reveal">
     <div class="product-visual" style="--product-bg:${product.bg};--product-box:${product.box};--product-ink:${product.ink}">
       <span class="product-badge">${product.badge}</span>
@@ -31,7 +31,7 @@ productGrid.innerHTML = products.map(product => `
 const saveCart = () => localStorage.setItem("incense-demo-cart", JSON.stringify(cart));
 
 function renderCart() {
-  const entries = Object.entries(cart).filter(([, quantity]) => quantity > 0);
+  const entries = Object.entries(cart).filter(([id, quantity]) => quantity > 0 && products.some(item => item.id === Number(id)));
   const count = entries.reduce((sum, [, quantity]) => sum + quantity, 0);
   $("#cartCount").textContent = count;
   $("#cartEmpty").hidden = entries.length > 0;
@@ -39,9 +39,13 @@ function renderCart() {
 
   $("#cartItems").innerHTML = entries.map(([id, quantity]) => {
     const product = products.find(item => item.id === Number(id));
+    const productUrl = product.url || `index.html#products`;
+    const thumbnail = product.image
+      ? `<img src="${product.image}" alt="${product.name}">`
+      : product.name.slice(0, 2);
     return `<div class="cart-item">
-      <div class="cart-thumb">${product.name.slice(0, 2)}</div>
-      <div><h3>${product.name}</h3><p>${money(product.price)}</p>
+      <a class="cart-thumb" href="${productUrl}" aria-label="查看${product.name}商品頁">${thumbnail}</a>
+      <div><h3><a href="${productUrl}">${product.name}</a></h3><p>${money(product.price)}</p>
         <div class="quantity"><button data-change="${id}" data-delta="-1" aria-label="減少數量">−</button><span>${quantity}</span><button data-change="${id}" data-delta="1" aria-label="增加數量">＋</button></div>
       </div>
       <button class="remove-item" data-remove="${id}">移除</button>
@@ -96,14 +100,14 @@ document.addEventListener("click", event => {
   }
 });
 
-$("#openCart").addEventListener("click", openCart);
-$("#closeCart").addEventListener("click", closeCart);
-$("#overlay").addEventListener("click", closeCart);
-$("#continueShopping").addEventListener("click", closeCart);
-$("#checkoutButton").addEventListener("click", () => showToast("這是展示網站，未連接真實付款"));
+$("#openCart")?.addEventListener("click", openCart);
+$("#closeCart")?.addEventListener("click", closeCart);
+$("#overlay")?.addEventListener("click", closeCart);
+$("#continueShopping")?.addEventListener("click", closeCart);
+$("#checkoutButton")?.addEventListener("click", () => showToast("這是展示網站，未連接真實付款"));
 document.addEventListener("keydown", event => { if (event.key === "Escape") closeCart(); });
 
-$("#newsletterForm").addEventListener("submit", event => {
+$("#newsletterForm")?.addEventListener("submit", event => {
   event.preventDefault();
   $("#formMessage").textContent = "訂閱示範完成（未儲存真實資料）";
   event.currentTarget.reset();
