@@ -76,14 +76,15 @@ h2 { font-size: clamp(30px, 4vw, 46px); line-height: 1.45; letter-spacing: .07em
 .section-heading { margin-bottom: 55px; display: flex; align-items: end; justify-content: space-between; gap: 40px; }
 .section-heading > p { max-width: 360px; margin: 0; color: #657069; line-height: 1.8; }
 .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
-.product-card { background: var(--paper); transition: .3s; }.product-card:hover { transform: translateY(-8px); box-shadow: 0 18px 40px rgba(49,56,47,.12); }
+.product-card { min-width: 0; display: flex; flex-direction: column; background: var(--paper); transition: .3s; }.product-card:hover { transform: translateY(-8px); box-shadow: 0 18px 40px rgba(49,56,47,.12); }
 .product-visual { height: 360px; position: relative; overflow: hidden; display: grid; place-items: center; background: var(--product-bg); }
+.product-card .medicine-buddha-photo { width: 100%; height: 100%; display: block; position: relative; z-index: 1; object-fit: cover; }
 .product-visual::before { content: ""; width: 210px; height: 210px; position: absolute; border-radius: 50%; background: rgba(255,255,255,.3); }
 .product-box { width: 118px; height: 245px; padding-top: 48px; position: relative; z-index: 1; color: var(--product-ink); background: var(--product-box); border: 1px solid rgba(31,43,36,.18); text-align: center; box-shadow: 12px 18px 26px rgba(39,43,37,.16); font-family: var(--serif); letter-spacing: .12em; transform: rotate(-3deg); transition: .3s; }
 .product-card:hover .product-box { transform: rotate(0) scale(1.04); }
 .product-box::after { content: "天然香品"; display: block; width: 22px; margin: 22px auto 0; padding: 7px 2px; color: white; background: var(--rust); font: 9px var(--sans); writing-mode: vertical-rl; letter-spacing: .18em; }
 .product-badge { position: absolute; left: 18px; top: 18px; z-index: 2; padding: 6px 10px; color: white; background: var(--rust); font-size: 10px; letter-spacing: .15em; }
-.product-info { padding: 25px; }.product-meta { color: #8b8e87; font-size: 10px; letter-spacing: .16em; }.product-info h3 { margin: 9px 0; font-family: var(--serif); font-size: 22px; letter-spacing: .08em; }.product-info p { min-height: 48px; color: #6f766f; font-size: 13px; line-height: 1.8; }.product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }.product-footer strong { font-family: var(--serif); }.add-button { width: 42px; height: 42px; color: white; background: var(--ink); border: 0; border-radius: 50%; cursor: pointer; font-size: 23px; transition: .2s; }.add-button:hover { background: var(--rust); transform: rotate(90deg); }
+.product-info { padding: 25px; }.product-card .product-info { flex: 1; display: flex; flex-direction: column; }.product-card .product-copy-link { display: block; }.product-meta { color: #8b8e87; font-size: 10px; letter-spacing: .16em; }.product-info h3 { margin: 9px 0; font-family: var(--serif); font-size: 22px; letter-spacing: .08em; }.product-info p { min-height: 48px; color: #6f766f; font-size: 13px; line-height: 1.8; }.product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }.product-card .product-footer { margin-top: auto; }.product-footer strong { font-family: var(--serif); }.add-button { width: 42px; height: 42px; color: white; background: var(--ink); border: 0; border-radius: 50%; cursor: pointer; font-size: 23px; transition: .2s; }.add-button:hover { background: var(--rust); transform: rotate(90deg); }
 
 .product-detail { width: min(1180px, calc(100% - 44px)); margin: 0 auto; padding: clamp(56px, 7vw, 96px) 0; display: grid; grid-template-columns: minmax(320px, 500px) minmax(0, 1fr); align-items: center; gap: clamp(42px, 7vw, 90px); }
 .detail-visual { min-width: 0; }
@@ -103,6 +104,19 @@ h2 { font-size: clamp(30px, 4vw, 46px); line-height: 1.45; letter-spacing: .07em
 .detail-note-grid p { padding: 18px 0; border-bottom: 1px solid var(--line); }
 .detail-note-grid strong, .detail-note-grid span { display: block; }
 .detail-note-grid span { margin-top: 7px; color: #69726d; }
+.product-story { display: grid; grid-template-columns: minmax(260px, .75fr) minmax(0, 1.25fr); gap: clamp(44px, 8vw, 120px); background: #f0eadf; }
+.product-story-heading { align-self: start; position: sticky; top: 125px; }
+.product-story-heading h2 { font-size: clamp(32px, 4vw, 48px); }
+.product-story-lead { margin: 26px 0 0; color: #5e6862; font-family: var(--serif); font-size: 18px; line-height: 1.9; }
+.product-story-body { max-width: 720px; color: #4f5c55; font-size: 15px; line-height: 2; }
+.product-story-body > p { margin: 0 0 20px; }
+.product-variants { margin: 34px 0; border-top: 1px solid var(--line); }
+.product-variants p { margin: 0; padding: 20px 0; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }
+.product-variants strong { color: var(--ink); font: 500 18px var(--serif); }
+.product-variants span { color: var(--rust); white-space: nowrap; }
+.product-purpose { color: var(--ink); font-family: var(--serif); font-size: 18px; letter-spacing: .06em; }
+.product-offers { margin: 30px 0 0; padding: 24px 24px 24px 44px; background: rgba(255,255,255,.52); border-left: 3px solid var(--rust); }
+.product-offers li + li { margin-top: 8px; }
 
 .ritual { color: #f4f0e5; background: var(--pine); }
 .ritual { display: grid; grid-template-columns: .8fr 1.2fr; gap: 9vw; align-items: center; }
@@ -129,6 +143,9 @@ footer > div:not(.brand) strong, footer a, footer p { display: block; margin: 0 
   .section-heading { align-items: start; flex-direction: column; }.product-grid { grid-template-columns: 1fr; }.product-visual { height: 340px; }.ritual { gap: 55px; }
   .product-detail { width: min(100% - 30px, 620px); padding: 42px 0 70px; grid-template-columns: 1fr; gap: 36px; }
   .detail-visual .product-visual.compact { height: auto; max-height: 520px; }
+  .product-story { grid-template-columns: 1fr; gap: 34px; }
+  .product-story-heading { position: static; }
+  .product-variants p { align-items: flex-start; flex-direction: column; gap: 5px; }
   .compact-section { grid-template-columns: 1fr; }
   footer { grid-template-columns: 1fr; }.copyright { grid-column: 1; }
 }

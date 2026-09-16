@@ -32,15 +32,17 @@
     card.innerHTML = `
       <a href="product.html?id=1" class="product-link" aria-label="查看藥師佛藥香2H商品詳情">
         ${productImage(false)}
-        <div class="product-info">
+      </a>
+      <div class="product-info">
+        <a href="product.html?id=1" class="product-copy-link" aria-label="查看藥師佛藥香2H商品詳情">
           <span class="product-meta">${product.type}</span>
           <h3>${product.name}</h3>
           <p>${product.note}<br>${product.spec}</p>
+        </a>
+        <div class="product-footer product-card-footer">
+          <strong>${money(product.price)}</strong>
+          <button class="add-button" type="button" data-add="1" aria-label="將藥師佛藥香2H加入購物車">＋</button>
         </div>
-      </a>
-      <div class="product-footer product-card-footer">
-        <strong>${money(product.price)}</strong>
-        <button class="add-button" type="button" data-add="1" aria-label="將藥師佛藥香2H加入購物車">＋</button>
       </div>`;
   }
 
