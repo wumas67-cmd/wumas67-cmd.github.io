@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f6f2">
+  <meta name="description" content="自訂 1–50 則 LINE 貼圖文字，生成分批提示詞，分割綠幕圖並下載透明 PNG。">
+  <title>貼圖文字工作室｜自訂 1–50 則文字</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar"><div class="brand"><span class="brandmark">✳</span><span>貼圖文字工作室 <small>STICKER STUDIO</small></span></div><span class="topnote">在瀏覽器中製作 · 圖片不會上傳到伺服器</span></header>
+  <main>
+    <section class="hero"><div><span class="eyebrow">LINE STICKER MAKER · 01 / 03</span><h1>你的貼圖，<em>你的台詞。</em></h1><p>從一句到五十句，在網頁挑選、修改文字，接著生成圖片提示詞、分割貼圖與下載透明 PNG。</p></div><div class="hero-art" aria-hidden="true"><span class="bubble a">早安！</span><span class="bubble b">收到 ♡</span><span class="spark">✳</span></div></section>
+    <div class="steps"><button class="step active" data-step="1"><b>01</b><span>編輯貼圖文字</span></button><button class="step" data-step="2"><b>02</b><span>複製生成提示詞</span></button><button class="step" data-step="3"><b>03</b><span>切圖去背與下載</span></button></div>
+    <section class="panel" id="step1">
+      <div class="section-head"><div><span class="eyebrow">STEP 01 · TEXT LIBRARY</span><h2>挑選你的貼圖文字</h2><p>可設定 1–50 則。點選常用語填入，或直接修改每一格。</p></div><div class="count-control"><label for="count">文字數量 <strong id="countValue">20</strong> / 50</label><input id="count" type="range" min="1" max="50" value="20"><input id="countNumber" type="number" min="1" max="50" value="20" aria-label="文字數量，1 至 50"></div></div>
+      <div class="preset-wrap"><div class="minor-head"><h3>快速加入常用語</h3><span>點擊後填入下一個空白欄位；全部已填時會取代目前選取的一格</span></div><div id="presets" class="presets"></div></div>
+      <div class="minor-head editor-head"><h3>逐格編輯 <span id="editorCount"></span></h3><div class="editor-actions"><button class="text-button" id="pasteList">貼上多行文字</button><button class="text-button" id="clearAll">清空文字</button></div></div>
+      <div id="editors" class="editors"></div>
+      <div class="panel-footer"><span id="saveNote" class="muted">自動儲存在此瀏覽器</span><button class="primary" id="toStep2">下一步：產生提示詞 <span>→</span></button></div>
+    </section>
+    <section class="panel hidden" id="step2">
+      <div class="section-head"><div><span class="eyebrow">STEP 02 · AI IMAGE PROMPTS</span><h2>分批生成貼圖大圖</h2><p>每批最多 20 格（5 欄 × 4 列）。50 則會分成 20 + 20 + 10；逐批複製提示詞給你的生圖工具。</p></div><div class="pill" id="batchCount"></div></div>
+      <div class="settings-grid"><label>角色描述<input id="character" placeholder="例：穿橘色圍裙的黑白邊牧" value="可愛的黑白邊牧"></label><label>畫風<select id="style"><option>童趣手繪貼紙風</option><option>可愛 Q 版</option><option>3D 公仔</option><option>清新水彩</option><option>扁平插畫</option><option>照片級寫實</option><option>日系 Chibi</option></select></label><label>文字製作方式<select id="textMode"><option value="ai">讓 AI 畫出文字</option><option value="web">只生成無字角色，稍後在網頁加字</option></select></label></div>
+      <div class="hint"><strong>文字準確度：</strong>生圖工具可能畫錯中文字。若想在網頁自由修改文字，選「只生成無字角色」，第 3 步開啟「疊加網頁文字」。</div>
+      <div id="prompts" class="prompt-list"></div>
+      <div class="panel-footer"><button class="secondary" data-back="1">← 返回文字</button><button class="primary" id="toStep3">下一步：上傳貼圖大圖 <span>→</span></button></div>
+    </section>
+    <section class="panel hidden" id="step3">
+      <div class="section-head"><div><span class="eyebrow">STEP 03 · IMAGE WORKSHOP</span><h2>切圖、去背、下載</h2><p>依序上傳每批 5 × 4 綠幕圖。可預覽結果，指定 Main 和 Tab 封面。</p></div><div class="pill" id="imageStatus">尚未上傳</div></div>
+      <div id="uploadRows" class="upload-rows"></div>
+      <div class="settings-grid processing"><label>綠幕去背強度 <strong id="toleranceValue">42</strong><input id="tolerance" type="range" min="15" max="100" value="42"></label><label class="check"><input id="overlay" type="checkbox"><span>疊加網頁文字<br><small>請搭配無字圖；原圖已有文字不會自動清除</small></span></label><label>文字顏色<input id="textColor" type="color" value="#ff6b54"></label></div>
+      <div class="hint">分割依每張圖片的 5 欄 × 4 列。請確認主體沒有跨格；綠色角色或綠色文字也可能被去背。</div>
+      <div class="result-head"><h3>貼圖預覽 <span id="resultCount">0 / 20</span></h3><span class="muted">點選圖片下的 Main / Tab 設為封面</span></div>
+      <div id="results" class="results"><div class="empty">上傳第一批大圖後，在這裡預覽透明貼圖。</div></div>
+      <div id="validity" class="validity"></div>
+      <div class="panel-footer"><button class="secondary" data-back="2">← 返回提示詞</button><button class="primary" id="download" disabled>下載 ZIP <span>↓</span></button></div>
+    </section>
+    <footer><span>獨立製作的貼圖工具 · 與 Meiko 微課頻道及 LINE 無關</span><a href="https://creator.line.me/zh-hant/guideline/sticker/" target="_blank" rel="noopener noreferrer">LINE 官方貼圖規格 ↗</a></footer>
+  </main>
+  <dialog id="pasteDialog"><form method="dialog"><h2>貼上多行文字</h2><p>每一行代表一張貼圖，最多取前 50 行。會從第 1 格開始覆蓋。</p><textarea id="bulkText" rows="12" placeholder="早安！&#10;謝謝你&#10;辛苦了"></textarea><div class="dialog-actions"><button value="cancel" class="secondary">取消</button><button id="confirmPaste" value="confirm" class="primary">套用文字</button></div></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
