@@ -7,6 +7,7 @@
   <meta name="description" content="自訂 1–50 則 LINE 貼圖文字，生成分批提示詞，分割綠幕圖並下載透明 PNG。">
   <title>貼圖文字工作室｜自訂 1–50 則文字</title>
   <link rel="stylesheet" href="style.css">
+  <script defer src="categories.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -15,8 +16,9 @@
     <section class="hero"><div><span class="eyebrow">LINE STICKER MAKER · 01 / 03</span><h1>你的貼圖，<em>你的台詞。</em></h1><p>從一句到五十句，在網頁挑選、修改文字，接著生成圖片提示詞、分割貼圖與下載透明 PNG。</p></div><div class="hero-art" aria-hidden="true"><span class="bubble a">早安！</span><span class="bubble b">收到 ♡</span><span class="spark">✳</span></div></section>
     <div class="steps"><button class="step active" data-step="1"><b>01</b><span>編輯貼圖文字</span></button><button class="step" data-step="2"><b>02</b><span>複製生成提示詞</span></button><button class="step" data-step="3"><b>03</b><span>切圖去背與下載</span></button></div>
     <section class="panel" id="step1">
-      <div class="section-head"><div><span class="eyebrow">STEP 01 · TEXT LIBRARY</span><h2>挑選你的貼圖文字</h2><p>可設定 1–50 則。點選常用語填入，或直接修改每一格。</p></div><div class="count-control"><label for="count">文字數量 <strong id="countValue">20</strong> / 50</label><input id="count" type="range" min="1" max="50" value="20"><input id="countNumber" type="number" min="1" max="50" value="20" aria-label="文字數量，1 至 50"></div></div>
-      <div class="preset-wrap"><div class="minor-head"><h3>快速加入常用語</h3><span>點擊後填入下一個空白欄位；全部已填時會取代目前選取的一格</span></div><div id="presets" class="presets"></div></div>
+      <div class="section-head"><div><span class="eyebrow">STEP 01 · TEXT LIBRARY</span><h2>挑選你的貼圖文字</h2><p>先選主題，再設定 1–50 則貼圖文字；每格都可以自行修改。</p></div><div class="count-control"><label for="count">文字數量 <strong id="countValue">20</strong> / 50</label><input id="count" type="range" min="1" max="50" value="20"><input id="countNumber" type="number" min="1" max="50" value="20" aria-label="文字數量，1 至 50"></div></div>
+      <div class="category-wrap"><div class="minor-head"><h3>選擇主題內容</h3><span>12 個主題，每個主題備有 50 則建議文字</span></div><div id="categories" class="categories" role="group" aria-label="貼圖文字主題"></div><p class="category-note">切換主題會顯示該主題的文字；你改過的內容會依主題保留在此瀏覽器。</p></div>
+      <details class="preset-wrap"><summary><strong id="categoryName">日常用語 · 建議文字</strong><span>展開 50 則建議文字</span></summary><p class="preset-note">先點選要修改的欄位，再點建議文字即可替換。</p><div id="presets" class="presets"></div></details>
       <div class="minor-head editor-head"><h3>逐格編輯 <span id="editorCount"></span></h3><div class="editor-actions"><button class="text-button" id="pasteList">貼上多行文字</button><button class="text-button" id="clearAll">清空文字</button></div></div>
       <div id="editors" class="editors"></div>
       <div class="panel-footer"><span id="saveNote" class="muted">自動儲存在此瀏覽器</span><button class="primary" id="toStep2">下一步：產生提示詞 <span>→</span></button></div>
