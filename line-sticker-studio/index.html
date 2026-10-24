@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#f7f6f2">
   <meta name="description" content="自訂 1–50 則 LINE 貼圖文字，生成分批提示詞，分割綠幕圖並下載透明 PNG。">
   <title>貼圖文字工作室｜自訂 1–50 則文字</title>
-  <link rel="stylesheet" href="style.css?v=20261024-1">
+  <link rel="stylesheet" href="style.css?v=20261024-text2">
   <script defer src="categories.js?v=20261024-1"></script>
-  <script defer src="app.js?v=20261024-1"></script>
+  <script defer src="app.js?v=20261024-text2"></script>
   <link rel="stylesheet" href="splitter.css?v=20261024-cut1">
   <script defer src="cut-core.js?v=20261024-cut1"></script>
   <script defer src="splitter.js?v=20261024-cut1"></script>
@@ -21,9 +21,10 @@
     <section class="panel" id="step1">
       <div class="section-head"><div><span class="eyebrow">STEP 01 · TEXT LIBRARY</span><h2>挑選你的貼圖文字</h2><p>先選主題，再設定 1–50 則貼圖文字；每格都可以自行修改。</p></div><div class="count-control"><label for="count">文字數量 <strong id="countValue">20</strong> / 50</label><input id="count" type="range" min="1" max="50" value="20"><input id="countNumber" type="number" min="1" max="50" value="20" aria-label="文字數量，1 至 50"></div></div>
       <div class="category-wrap"><div class="minor-head"><h3>選擇主題內容</h3><span>12 個主題，每個主題備有 50 則建議文字</span></div><div id="categories" class="categories" role="group" aria-label="貼圖文字主題"></div><p class="category-note">切換主題會顯示該主題的文字；你改過的內容會依主題保留在此瀏覽器。</p></div>
-      <details class="preset-wrap"><summary><strong id="categoryName">日常用語 · 建議文字</strong><span>展開 50 則建議文字</span></summary><p class="preset-note">先點選要修改的欄位，再點建議文字即可替換。</p><div id="presets" class="presets"></div></details>
+      <details class="preset-wrap"><summary><strong id="categoryName">日常用語 · 建議文字</strong><span>展開 50 則建議文字</span></summary><p class="preset-note">搜尋並挑選語句；點選已選文字可取消。點選欄位再點語句，可取代該格。</p><input id="presetSearch" type="search" placeholder="搜尋文字，例如：謝謝、下班、回家" aria-label="搜尋建議文字"><div class="preset-filters"><label><input id="hideUsed" type="checkbox"> 隱藏已使用</label><label><input id="avoidDupes" type="checkbox" checked> 避免重複</label><button type="button" class="text-button" id="autoFill">自動填滿空格</button></div><p id="presetMatch" class="muted"></p><div id="presets" class="presets"></div></details>
       <div class="minor-head editor-head"><h3>逐格編輯 <span id="editorCount"></span></h3><div class="editor-actions"><button class="text-button" id="pasteList">貼上多行文字</button><button class="text-button" id="clearAll">清空文字</button></div></div>
-      <div id="editors" class="editors"></div>
+      <div id="editors" class="editors"></div><div class="custom-phrase"><label for="customPhrase">新增自己的貼圖文字</label><div><input id="customPhrase" type="text" maxlength="30" placeholder="輸入一句貼圖文字"><button type="button" class="secondary" id="addPhrase">＋ 加入</button></div></div>
+      <section class="text-design" aria-labelledby="designTitle"><div class="minor-head"><h3 id="designTitle">貼圖文字設計</h3><span>提示詞與網頁疊字同步</span></div><div class="design-controls"><label>文字／角色比例<select id="textRatio"><option value="25">角色為主（文字約 25%）</option><option value="40">均衡配置（文字約 40%）</option><option value="55">文字醒目（文字約 55%）</option><option value="70">大字主角（文字約 70%）</option></select></label><label>字體風格<select id="fontStyle"><option value="bold">粗黑體</option><option value="round">圓體</option><option value="bubble">可愛泡泡字</option><option value="natural">自然手寫體</option><option value="marker">毛筆字</option><option value="retro">復古印刷字</option><option value="pixel">像素字</option><option value="upright">立體字</option><option value="street">街頭塗鴉字</option><option value="custom">自訂字體風格</option></select></label><label>文字顏色<select id="fontColorPreset"><option value="auto">自動高對比</option><option value="#000000">純黑</option><option value="#ffffff">純白</option><option value="#243c6b">深棕藍</option><option value="#7544a2">品牌紫</option><option value="#ef454f">活力紅</option><option value="#eb70ac">櫻花粉</option><option value="#e6a42a">亮橘黃</option><option value="#318dcc">天空藍</option><option value="#36a56b">草綠</option><option value="custom">自訂顏色</option></select></label><label>自訂顏色<input id="customFontColor" type="color" value="#ff6b54"></label><label>背景<select id="designBackground"><option value="transparent">透明背景</option><option value="solid">純色背景</option></select></label><label>背景色<input id="designBgColor" type="color" value="#fcebdc"></label><label>文字描邊<select id="textStroke"><option value="auto">自動對比描邊</option><option value="white">白色描邊</option><option value="black">黑色描邊</option><option value="none">不描邊</option></select></label><label>自訂字體描述<input id="customFont" type="text" maxlength="80" placeholder="例如：圓潤有彈性的手寫字"></label></div><div class="design-preview" id="designPreview" aria-live="polite"><span>早安！</span></div><p class="muted">字體名稱會寫入生圖提示詞；網頁疊字會以瀏覽器可用字體呈現相近效果。</p></section>
       <div class="panel-footer"><span id="saveNote" class="muted">自動儲存在此瀏覽器</span><button class="primary" id="toStep2">下一步：產生提示詞 <span>→</span></button></div>
     </section>
     <section class="panel hidden" id="step2">
