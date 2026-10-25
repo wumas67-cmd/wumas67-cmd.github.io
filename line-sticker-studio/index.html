@@ -8,7 +8,7 @@
   <title>貼圖文字工作室｜自訂 1–50 則文字</title>
   <link rel="stylesheet" href="style.css?v=20261024-text2">
   <script defer src="categories.js?v=20261024-1"></script>
-  <script defer src="app.js?v=20261024-text2"></script>
+  <script defer src="app.js?v=20261025-noborder1"></script>
   <link rel="stylesheet" href="splitter.css?v=20261024-cut2">
   <script defer src="cut-core.js?v=20261024-cut2"></script>
   <script defer src="splitter.js?v=20261024-cut2"></script>
@@ -30,7 +30,7 @@
     <section class="panel hidden" id="step2">
       <div class="section-head"><div><span class="eyebrow">STEP 02 · AI IMAGE PROMPTS</span><h2>分批生成貼圖大圖</h2><p>每批最多 20 格（5 欄 × 4 列）。50 則會分成 20 + 20 + 10；逐批複製提示詞給你的生圖工具。</p></div><div class="pill" id="batchCount"></div></div>
       <div class="settings-grid"><label>角色描述<input id="character" placeholder="例：穿橘色圍裙的黑白邊牧" value="可愛的黑白邊牧"></label><label>畫風<select id="style"><option>童趣手繪貼紙風</option><option>可愛 Q 版</option><option>3D 公仔</option><option>清新水彩</option><option>扁平插畫</option><option>照片級寫實</option><option>日系 Chibi</option></select></label><label>文字製作方式<select id="textMode"><option value="ai">讓 AI 畫出文字</option><option value="web">只生成無字角色，稍後在網頁加字</option></select></label></div>
-      <div class="hint"><strong>文字準確度：</strong>生圖工具可能畫錯中文字。若想在網頁自由修改文字，選「只生成無字角色」，第 3 步開啟「疊加網頁文字」。</div>
+      <div class="hint"><strong>無白邊提示詞：</strong>原始合圖使用純綠幕，不要求白色貼紙邊框，並明確保留角色本身的白毛與物件原有白色。生圖工具可能畫錯中文字；若想在網頁自由修改文字，選「只生成無字角色」，第 3 步開啟「疊加網頁文字」。</div>
       <div id="prompts" class="prompt-list"></div>
       <div class="panel-footer"><button class="secondary" data-back="1">← 返回文字</button><button class="primary" id="toStep3">下一步：上傳貼圖大圖 <span>→</span></button></div>
     </section>
