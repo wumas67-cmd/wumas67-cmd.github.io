@@ -14,6 +14,45 @@ function mask(data,w,h,bg,tolerance){
  for(let x=0;x<w;x++){visit(x);visit((h-1)*w+x)}for(let y=0;y<h;y++){visit(y*w);visit(y*w+w-1)}
  while(head<tail){const p=q[head++],x=p%w;if(x)visit(p-1);if(x<w-1)visit(p+1);if(p>=w)visit(p-w);if(p<n-w)visit(p+w)}return keep;
 }
+function flatMask(data,w,h,bg,tolerance){
+ const keep=new Uint8Array(w*h);
+ for(let i=0;i<keep.length;i++){const p=i*4;keep[i]=data[p+3]>20&&Math.max(Math.abs(data[p]-bg[0]),Math.abs(data[p+1]-bg[1]),Math.abs(data[p+2]-bg[2]))>tolerance?1:0}
+ return keep;
+}
+// Estimate an edge pixel's coverage from a nearby opaque foreground color,
+// then unmix the green background. Interior pixels are never changed.
+function despill(data,w,h,bg,keep,strength=70){
+ for(let i=0;i<keep.length;i++)if(!keep[i])data[i*4+3]=0;
+ if(!bg||bg[1]<bg[0]+90||bg[1]<bg[2]+90||strength<=0)return data;
+ const original=new Uint8ClampedArray(data),radius=Math.min(5,Math.max(2,Math.round(strength/30)+1)),mix=Math.min(1,strength/70),interiorRadius=radius+3,dist=new Uint8Array(w*h);
+ dist.fill(255);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;if(!keep[i]){dist[i]=0;continue}let d=dist[i];if(x)d=Math.min(d,dist[i-1]+1);if(y){d=Math.min(d,dist[i-w]+1);if(x)d=Math.min(d,dist[i-w-1]+1);if(x+1<w)d=Math.min(d,dist[i-w+1]+1)}dist[i]=d}
+ for(let y=h-1;y>=0;y--)for(let x=w-1;x>=0;x--){const i=y*w+x;if(!keep[i])continue;let d=dist[i];if(x+1<w)d=Math.min(d,dist[i+1]+1);if(y+1<h){d=Math.min(d,dist[i+w]+1);if(x)d=Math.min(d,dist[i+w-1]+1);if(x+1<w)d=Math.min(d,dist[i+w+1]+1)}dist[i]=d}
+ const excess=p=>original[p+1]-(original[p]+original[p+2])/2;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const i=y*w+x,p=i*4;if(!keep[i]||dist[i]>radius||excess(p)<10)continue;
+  let best=-1,bestScore=Infinity;
+  for(let dy=-interiorRadius;dy<=interiorRadius;dy++)for(let dx=-interiorRadius;dx<=interiorRadius;dx++){
+   const xx=x+dx,yy=y+dy;if(xx<0||xx>=w||yy<0||yy>=h||(!dx&&!dy))continue;
+   const j=yy*w+xx,q=j*4;if(!keep[j]||original[q+3]<230||excess(q)>Math.max(18,excess(p)*.55))continue;
+   const score=dx*dx+dy*dy+Math.max(0,excess(q))*0.02;
+   if(score<bestScore){bestScore=score;best=q}
+  }
+  if(best<0)continue;
+  let dot=0,length=0;
+  for(let k=0;k<3;k++){const direction=original[best+k]-bg[k];dot+=(original[p+k]-bg[k])*direction;length+=direction*direction}
+  if(length<1000)continue;
+  const coverage=Math.max(0,Math.min(1,dot/length));if(coverage>.98)continue;
+  if(coverage<.06){data[p+3]=0;continue}
+  const opacity=Math.max(0,Math.min(1,1-mix+mix*coverage));
+  data[p+3]=Math.round(original[p+3]*opacity*(strength>70?1-(strength-70)/300:1));
+  for(let k=0;k<3;k++){
+   const corrected=Math.max(0,Math.min(255,(original[p+k]-(1-coverage)*bg[k])/coverage));
+   data[p+k]=Math.round(original[p+k]*(1-mix)+corrected*mix);
+  }
+ }
+ return data;
+}
 function detect(mask,w,h,gap,minArea){
  const seen=new Uint8Array(w*h),q=new Int32Array(w*h),parts=[];
  for(let p=0;p<mask.length;p++){if(!mask[p]||seen[p])continue;let a=0,b=0,count=0,x0=w,y0=h,x1=0,y1=0;q[b++]=p;seen[p]=1;while(a<b){const i=q[a++],x=i%w,y=Math.floor(i/w);count++;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy,j=yy*w+xx;if(xx>=0&&xx<w&&yy>=0&&yy<h&&mask[j]&&!seen[j]){seen[j]=1;q[b++]=j}}}if(count>=3)parts.push({x:x0,y:y0,w:x1-x0+1,h:y1-y0+1,area:count})}
@@ -23,5 +62,5 @@ function detect(mask,w,h,gap,minArea){
  const boxes=parts.filter(b=>b.area>=w*h*minArea/100).sort((a,b)=>a.y-b.y),rows=[];
  for(const b of boxes){let row=rows.find(r=>Math.abs((b.y+b.h/2)-r.cy)<Math.min(r.h,b.h)*.45);if(!row){row={cy:b.y+b.h/2,h:b.h,boxes:[]};rows.push(row)}row.boxes.push(b)}return rows.flatMap(r=>r.boxes.sort((a,b)=>a.x-b.x));
 }
-const api={background,mask,detect};if(typeof module!=='undefined')module.exports=api;else root.CutCore=api;
+const api={background,mask,flatMask,despill,detect};if(typeof module!=='undefined')module.exports=api;else root.CutCore=api;
 })(typeof window!=='undefined'?window:this);
