@@ -8,10 +8,10 @@
   <title>貼圖文字工作室｜自訂 1–50 則文字</title>
   <link rel="stylesheet" href="style.css?v=20261024-text2">
   <script defer src="categories.js?v=20261024-1"></script>
-  <script defer src="app.js?v=20261025-noborder1"></script>
-  <link rel="stylesheet" href="splitter.css?v=20261024-cut2">
-  <script defer src="cut-core.js?v=20261024-cut2"></script>
-  <script defer src="splitter.js?v=20261024-cut2"></script>
+  <script defer src="app.js?v=20261025-defringe1"></script>
+  <link rel="stylesheet" href="splitter.css?v=20261025-defringe1">
+  <script defer src="cut-core.js?v=20261025-defringe1"></script>
+  <script defer src="splitter.js?v=20261025-defringe1"></script>
 </head>
 <body>
   <header class="topbar"><div class="brand"><span class="brandmark">✳</span><span>貼圖文字工作室 <small>STICKER STUDIO</small></span></div><span class="topnote">在瀏覽器中製作 · 圖片不會上傳到伺服器</span></header>
@@ -37,7 +37,7 @@
     <section class="panel hidden" id="step3">
       <div class="section-head"><div><span class="eyebrow">STEP 03 · IMAGE WORKSHOP</span><h2>切圖、去背、下載</h2><p>依序上傳每批 5 × 4 綠幕圖。可預覽結果，指定 Main 和 Tab 封面。</p></div><div class="pill" id="imageStatus">尚未上傳</div></div>
       <div id="uploadRows" class="upload-rows"></div>
-      <div class="settings-grid processing"><label>綠幕去背強度 <strong id="toleranceValue">42</strong><input id="tolerance" type="range" min="15" max="100" value="42"></label><label class="check"><input id="overlay" type="checkbox"><span>疊加網頁文字<br><small>請搭配無字圖；原圖已有文字不會自動清除</small></span></label><label>文字顏色<input id="textColor" type="color" value="#ff6b54"></label></div>
+      <div class="settings-grid processing"><label>綠幕去背強度 <strong id="toleranceValue">42</strong><input id="tolerance" type="range" min="15" max="100" value="42"></label><label>去綠邊強度 <strong id="spillValue">70</strong><input id="spill" type="range" min="0" max="100" value="70"><small>保留白毛；過強可往左調</small></label><label class="check"><input id="overlay" type="checkbox"><span>疊加網頁文字<br><small>請搭配無字圖；原圖已有文字不會自動清除</small></span></label><label>文字顏色<input id="textColor" type="color" value="#ff6b54"></label></div>
       <div class="hint">分割依每張圖片的 5 欄 × 4 列。請確認主體沒有跨格；綠色角色或綠色文字也可能被去背。</div>
       <div class="result-head"><h3>貼圖預覽 <span id="resultCount">0 / 20</span></h3><label class="check"><input id="legacyCover" type="checkbox" checked><span>ZIP 加入 Main / Tab（僅前 20 張可選封面）</span></label></div>
       <div id="results" class="results"><div class="empty">上傳第一批大圖後，在這裡預覽透明貼圖。</div></div>
