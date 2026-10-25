@@ -5,9 +5,9 @@ const panel=document.createElement('div');panel.id='smartCutter';panel.innerHTML
 <div class="cut-layout"><div class="cut-stage"><div id="cutEmpty" class="cut-empty">上傳後會顯示原圖與編號框<br>可拖動框、右下角控制點或網格分隔線</div><canvas id="cutCanvas" hidden aria-label="貼圖切割框編輯畫布"></canvas></div>
 <div class="cut-controls">
 <div class="cut-row"><button class="cut-btn" id="cutAuto" aria-pressed="true">自動偵測</button><button class="cut-btn" id="cutManual" aria-pressed="false">手動調整</button></div>
-<label>背景辨識<select id="cutBg"><option value="auto">自動：由四邊推測</option><option value="white">純白色</option><option value="green">純綠色</option><option value="custom">自訂底色</option><option value="keep">保留原圖／透明背景</option></select></label><label>自訂底色<input id="cutColor" type="color" value="#ffffff"></label>
+<label>背景辨識<select id="cutBg"><option value="green" selected>純綠色（推薦）</option><option value="auto">自動：由四邊推測</option><option value="white">純白色（白色主體可能消失）</option><option value="custom">自訂底色</option><option value="keep">保留原圖／透明背景</option></select></label><label>自訂底色<input id="cutColor" type="color" value="#00ff00"></label>
 <label>背景容差 <output id="cutTolVal">30</output><input id="cutTol" type="range" min="0" max="150" value="30"></label>
-<label>去綠邊強度 <output id="cutSpillVal">70</output><input id="cutSpill" type="range" min="0" max="100" value="70"><small>僅綠幕生效；白底邊緣請逐張檢查。</small></label>
+<label>去綠邊強度 <output id="cutSpillVal">70</output><input id="cutSpill" type="range" min="0" max="100" value="70"><small>修正綠色殘邊；白毛變薄時往左調。</small></label>
 <label>合併間距（原圖 px）<input id="cutGap" type="number" min="0" max="200" value="12"></label>
 <label>最小貼圖面積（%）<input id="cutArea" type="number" min="0.01" max="10" step="0.01" value="0.18"></label>
 <fieldset><legend>快速偵測模式</legend><div class="cut-choices" role="group" aria-label="快速偵測模式"><button class="cut-btn" data-detect-preset="decorations">少抓裝飾</button><button class="cut-btn" data-detect-preset="balanced" aria-pressed="true">平衡（推薦）</button><button class="cut-btn" data-detect-preset="details">多抓細節</button></div><small>選擇後會調整合併間距與最小面積；仍可自行微調。</small></fieldset>
