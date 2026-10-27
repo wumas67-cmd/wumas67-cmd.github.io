@@ -62,5 +62,33 @@ function detect(mask,w,h,gap,minArea){
  const boxes=parts.filter(b=>b.area>=w*h*minArea/100).sort((a,b)=>a.y-b.y),rows=[];
  for(const b of boxes){let row=rows.find(r=>Math.abs((b.y+b.h/2)-r.cy)<Math.min(r.h,b.h)*.45);if(!row){row={cy:b.y+b.h/2,h:b.h,boxes:[]};rows.push(row)}row.boxes.push(b)}return rows.flatMap(r=>r.boxes.sort((a,b)=>a.x-b.x));
 }
-const api={background,mask,flatMask,despill,detect};if(typeof module!=='undefined')module.exports=api;else root.CutCore=api;
+// The sheet consists of equal cells: a 370x320 frame plus half a 20px gutter on each side.
+const STICKER={width:370,height:320,padding:10,gap:20};
+function sheetLayout(cols,rows){
+ const {width,height,gap}=STICKER,cw=width+gap,ch=height+gap;
+ return {width:cols*cw,height:rows*ch,frames:Array.from({length:cols*rows},(_,i)=>({x:(i%cols)*cw+gap/2,y:Math.floor(i/cols)*ch+gap/2,w:width,h:height}))};
+}
+function alphaBounds(data,w,h,region={x:0,y:0,w,h}){
+ let x0=w,y0=h,x1=-1,y1=-1;
+ const left=Math.max(0,Math.round(region.x)),top=Math.max(0,Math.round(region.y)),right=Math.min(w,Math.round(region.x+region.w)),bottom=Math.min(h,Math.round(region.y+region.h));
+ for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)if(data[(y*w+x)*4+3]>0){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+ return x1<x0?null:{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
+}
+function fitRect(sw,sh,w=370,h=320,pad=10){
+ const s=Math.min((w-2*pad)/sw,(h-2*pad)/sh),dw=Math.max(1,Math.floor(sw*s)),dh=Math.max(1,Math.floor(sh*s));
+ return {x:Math.floor((w-dw)/2),y:Math.floor((h-dh)/2),w:dw,h:dh};
+}
+// Keep disconnected text and decorations together inside the user's chosen row/column layout.
+function gridBounds(data,w,h,cols,rows){
+ const boxes=[],edgeCells=[];
+ for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
+  const x=Math.round(col*w/cols),y=Math.round(row*h/rows),right=Math.round((col+1)*w/cols),bottom=Math.round((row+1)*h/rows);
+  const b=alphaBounds(data,w,h,{x,y,w:right-x,h:bottom-y});if(!b)continue;
+  if(b.x<=x||b.y<=y||b.x+b.w>=right||b.y+b.h>=bottom)edgeCells.push(row*cols+col+1);
+  boxes.push(b);
+ }
+ return {boxes,edgeCells};
+}
+const api={background,mask,flatMask,despill,detect,STICKER,sheetLayout,alphaBounds,fitRect,gridBounds};if(typeof module!=='undefined')module.exports=api;else root.CutCore=api;
 })(typeof window!=='undefined'?window:this);
+
