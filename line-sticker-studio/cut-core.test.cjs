@@ -47,3 +47,19 @@ let grouped=C.gridBounds(g,80,40,4,2);assert.equal(grouped.boxes.length,3);asser
 assert.equal(C.gridBounds(new Uint8ClampedArray(80*40*4),80,40,4,2).boxes.length,0);
 assert.equal(C.alphaBounds(new Uint8ClampedArray(16),2,2),null);
 console.log('PASS: 20px sheet gutters, 370x320 frames, safety padding, disconnected text grouping, empty cells, edge warnings');
+
+// Exercise the actual generated prompts, including batch 2 (17–32) of a 48-sticker 4x4 project.
+const vm=require('node:vm'),fs=require('node:fs'),source=fs.readFileSync(__dirname+'/app.js','utf8');
+const extract=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
+const promptState={grid:'4x4',count:48,texts:Array.from({length:50},(_,i)=>'文字'+(i+1)),characterSource:'reference',style:'童趣手繪貼紙風',palette:'柔和粉嫩',textMode:'ai',design:{textRatio:'25',fontStyle:'natural',fontColorPreset:'auto',textStroke:'auto'}};
+const ctx=vm.createContext({state:promptState,CutCore:C});
+vm.runInContext(extract('function gridSpec()', 'function resetSheets()')+extract('const fontLabels=', 'function renderDesignPreview()')+extract('function promptFor(batch)', 'function renderPrompts()'),ctx);
+for(const background of ['transparent','green']){
+ promptState.promptBackground=background;
+ const prompt=vm.runInContext('promptFor(batches()[1])',ctx);
+ for(const expected of ['第 2 批（共 3 批）','17–32','4 欄 × 4 列，共 16 格','1560 × 1360px','370 × 320px','水平與垂直淨間距均為 20px','距圖框四邊至少 10px','350 × 300px'])assert.ok(prompt.includes(expected),expected);
+ assert.ok(!prompt.includes('1950'));assert.ok(prompt.includes('「文字17」')&&prompt.includes('「文字32」'));assert.ok(!prompt.includes('「文字33」'));
+}
+promptState.count=18;let last=vm.runInContext('promptFor(batches()[1])',ctx);assert.ok(last.includes('第 3–16 格保持純 #00FF00 綠色空白'));assert.ok(last.includes('1560 × 1360px'));
+promptState.grid='5x4';assert.ok(vm.runInContext('promptFor(batches()[0])',ctx).includes('1950 × 1360px'));
+console.log('PASS: actual 4x4 prompts, batch 17-32, transparent and green spacing, partial final batch, 5x4 compatibility');
