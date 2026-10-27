@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="style.css?v=20261026-prompt1">
   <script defer src="categories.js?v=20261026-prompt1"></script>
   <script defer src="cut-core.js?v=20261027-spacing1"></script>
-  <script defer src="app.js?v=20261027-spacing1"></script>
+  <script defer src="app.js?v=20261027-grid4-spacing2"></script>
   <link rel="stylesheet" href="splitter.css?v=20261025-defringe1">
   <script defer src="splitter.js?v=20261027-spacing1"></script>
 </head>
@@ -32,7 +32,7 @@
       <div class="hint"><button type="button" class="secondary" id="catExample">套用虎斑貓 16 張範例</button><p>會取代目前文字與角色設定，套用韓系Q版、柔和粉嫩、4 × 4、透明 PNG 及 16 句招呼語。</p></div><fieldset class="character-source"><legend>角色來源</legend><div class="source-options"><label><input type="radio" name="characterSource" value="reference"> 參考上傳圖</label><label><input type="radio" name="characterSource" value="custom"> 自訂角色</label></div><div id="referenceControls" hidden><label class="reference-upload">選擇角色參考圖 <input id="referenceFile" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="referencePreview" class="reference-preview" hidden><img id="referenceThumb" alt="已選角色參考圖"><span id="referenceName"></span><button type="button" id="referenceRemove" class="text-button">移除圖片</button></div><p class="muted">圖片只在瀏覽器預覽；複製提示詞後，請把同一張圖一起上傳給生圖工具。重新整理後須重新選圖。</p></div><div id="customControls"><label for="character">角色描述</label><input id="character" placeholder="例：穿橘色圍裙的黑白邊牧" value="可愛的黑白邊牧"></div></fieldset>
       <div class="settings-grid"><label>畫風<select id="style"><option>韓系Q版</option><option>童趣手繪貼紙風</option><option>可愛 Q 版</option><option>3D 公仔</option><option>清新水彩</option><option>扁平插畫</option><option>照片級寫實</option><option>日系 Chibi</option></select></label><label>插畫配色<select id="palette"><option>柔和粉嫩</option><option>清新自然</option><option>鮮明活潑</option><option>復古暖色</option><option>黑白簡約</option><option>依參考圖配色</option></select></label><label>每批排列<select id="grid"><option value="4x4">4 × 4（16 張／批）</option><option value="5x4">5 × 4（20 張／批）</option></select></label><label>生圖背景<select id="promptBackground"><option value="green">純 #00FF00 綠幕</option><option value="transparent">透明背景 PNG</option></select></label><label>文字製作方式<select id="textMode"><option value="ai">讓 AI 畫出文字</option><option value="web">只生成無字角色，稍後在網頁加字</option></select></label></div>
       <div class="hint"><strong>無白邊提示詞：</strong>角色不加白色貼紙外框，保留原有白毛；文字依選項加高對比描邊。生圖背景可選純綠幕或真正透明 PNG；若 AI 輸出棋盤格假透明，請改用綠幕重生。生圖工具可能畫錯中文字；若想在網頁自由修改文字，選「只生成無字角色」，第 3 步開啟「疊加網頁文字」。</div>
-      <div class="hint"><strong>切割安全版面：</strong>圖框最大 370 × 320px、框與框之間 20px、圖案距框內四邊至少 10px。4 × 4 合圖為 1560 × 1360px；5 × 4 為 1950 × 1360px。AI 可能未精準遵守，請在第 3 步檢查切框；可下載程式重新排列的「20px 間距合圖」。</div>
+      <div class="hint"><strong>切割安全版面：</strong><span id="layoutSpec" aria-live="polite">圖框最大 370 × 320px、框間距 20px、框內四邊至少留白 10px。</span> AI 可能未精準遵守，請在第 3 步檢查切框；可下載程式重新排列的「20px 間距合圖」。</div>
       <div id="prompts" class="prompt-list"></div>
       <div class="panel-footer"><button class="secondary" data-back="1">← 返回文字</button><button class="primary" id="toStep3">下一步：上傳貼圖大圖 <span>→</span></button></div>
     </section>
@@ -52,4 +52,5 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
+
 
