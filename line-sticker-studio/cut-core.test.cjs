@@ -24,3 +24,26 @@ assert.ok(fringe[(4*fw+10)*4]>240&&fringe[(4*fw+10)*4+1]>240);
 assert.ok(fringe[(4*fw+10)*4+3]>90&&fringe[(4*fw+10)*4+3]<190);
 assert.deepEqual([...fringe.slice((4*fw+12)*4,(4*fw+12)*4+4)],[255,255,255,255]);
 console.log('PASS: background inference, edge flood, component bounds, gap merge, white detail, empty image, green fringe');
+
+// Physical atlas geometry: 20px between frames in both directions, even LINE dimensions.
+for(const cols of [4,5]){
+ const layout=C.sheetLayout(cols,4);assert.equal(layout.width,cols*390);assert.equal(layout.height,1360);
+ assert.equal(layout.frames[0].x,10);assert.equal(layout.frames[0].y,10);
+ for(let i=0;i<layout.frames.length;i++){
+  const b=layout.frames[i];assert.equal(b.w,370);assert.equal(b.h,320);
+  if(i%cols)assert.equal(b.x-(layout.frames[i-1].x+370),20);
+  if(i>=cols)assert.equal(b.y-(layout.frames[i-cols].y+320),20);
+ }
+}
+// Whole composition fits with safety margins, including thin and high-resolution source frames.
+for(const [sw,sh] of [[1402,1122],[800,30],[30,800],[370,320]])for(const pad of [10,20,50]){
+ const r=C.fitRect(sw,sh,370,320,pad);assert.ok(r.x>=pad&&r.y>=pad);assert.ok(r.x+r.w<=370-pad&&r.y+r.h<=320-pad);
+ assert.ok(Math.abs(r.w/r.h-sw/sh)<=sw/sh/r.h+1/r.h);
+}
+// Disconnected text stays with its character, blank cells are omitted, touching edges are flagged.
+const g=new Uint8ClampedArray(80*40*4),pixel=(x,y,a=255)=>g[(y*80+x)*4+3]=a;
+pixel(5,3);pixel(16,15);pixel(42,4);pixel(52,14);pixel(1,29,1);pixel(19,30);
+let grouped=C.gridBounds(g,80,40,4,2);assert.equal(grouped.boxes.length,3);assert.deepEqual(grouped.boxes[0],{x:5,y:3,w:12,h:13});assert.deepEqual(grouped.edgeCells,[5]);
+assert.equal(C.gridBounds(new Uint8ClampedArray(80*40*4),80,40,4,2).boxes.length,0);
+assert.equal(C.alphaBounds(new Uint8ClampedArray(16),2,2),null);
+console.log('PASS: 20px sheet gutters, 370x320 frames, safety padding, disconnected text grouping, empty cells, edge warnings');
