@@ -52,14 +52,27 @@ console.log('PASS: 20px sheet gutters, 370x320 frames, safety padding, disconnec
 const vm=require('node:vm'),fs=require('node:fs'),source=fs.readFileSync(__dirname+'/app.js','utf8');
 const extract=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
 const promptState={grid:'4x4',count:48,texts:Array.from({length:50},(_,i)=>'文字'+(i+1)),characterSource:'reference',style:'童趣手繪貼紙風',palette:'柔和粉嫩',textMode:'ai',design:{textRatio:'25',fontStyle:'natural',fontColorPreset:'auto',textStroke:'auto'}};
-const ctx=vm.createContext({state:promptState,CutCore:C});
+const Options=require('./studio-options.js');
+const ctx=vm.createContext({state:promptState,CutCore:C,StudioOptions:Options});
 vm.runInContext(extract('function gridSpec()', 'function resetSheets()')+extract('const fontLabels=', 'function renderDesignPreview()')+extract('function promptFor(batch)', 'function renderPrompts()'),ctx);
 for(const background of ['transparent','green']){
  promptState.promptBackground=background;
  const prompt=vm.runInContext('promptFor(batches()[1])',ctx);
- for(const expected of ['第 2 批（共 3 批）','17–32','4 欄 × 4 列，共 16 格','1560 × 1360px','370 × 320px','水平與垂直淨間距均為 20px','距圖框四邊至少 10px','350 × 300px'])assert.ok(prompt.includes(expected),expected);
+ for(const expected of ['第 2 批（共 3 批）','17–32','4 欄 × 4 列，共 16 格','1600 × 1600px','370 × 320px','各至少留 20px','至少保留 40px','360 × 360px'])assert.ok(prompt.includes(expected),expected);
  assert.ok(!prompt.includes('1950'));assert.ok(prompt.includes('「文字17」')&&prompt.includes('「文字32」'));assert.ok(!prompt.includes('「文字33」'));
 }
-promptState.count=18;let last=vm.runInContext('promptFor(batches()[1])',ctx);assert.ok(last.includes('第 3–16 格保持純 #00FF00 綠色空白'));assert.ok(last.includes('1560 × 1360px'));
-promptState.grid='5x4';assert.ok(vm.runInContext('promptFor(batches()[0])',ctx).includes('1950 × 1360px'));
+promptState.count=18;let last=vm.runInContext('promptFor(batches()[1])',ctx);assert.ok(last.includes('第 3–16 格保持純 #00FF00 綠色空白'));assert.ok(last.includes('1600 × 1600px'));
+promptState.grid='5x4';assert.ok(vm.runInContext('promptFor(batches()[0])',ctx).includes('2000 × 1600px'));
 console.log('PASS: actual 4x4 prompts, batch 17-32, transparent and green spacing, partial final batch, 5x4 compatibility');
+
+
+// New geometry and typography modes must stay consistent, including inherited art style.
+promptState.grid='5x4';promptState.count=40;promptState.design.textPosition='bottom';promptState.design.textStroke='dark';promptState.characterSource='reference';promptState.promptBackground='transparent';
+let prompt=vm.runInContext('promptFor(batches()[0])',ctx);
+for(const expected of ['2000 × 1600px','400 × 400px','共 20 格','第 1 批（共 2 批）','01–20','下方約 25%','上方約 75%','深灰黑色','舊式墨水鋼筆','真正的 Alpha','禁止自動加字'])assert.ok(prompt.includes(expected),expected);
+promptState.characterSource='reference-style';prompt=vm.runInContext('promptFor(batches()[0])',ctx);assert.ok(prompt.includes('沿用角色參考圖的人物畫風'));assert.ok(!prompt.includes('童趣手繪貼紙風'));assert.ok(!prompt.includes('柔和粉嫩'));
+promptState.texts[0]='好耶，又見到你啦';promptState.texts[1]='';promptState.texts[2]='無言喔……';prompt=vm.runInContext('promptFor(batches()[0])',ctx);assert.ok(prompt.includes('1. 「好耶，又見到你啦」'));assert.ok(prompt.includes('2. （此格只畫角色，不顯示任何文字）'));assert.ok(prompt.includes('3. 「無言喔……」'));
+for(const position of ['bottom','top','side','auto'])for(const ratio of [25,40,55,70]){const r=Options.regions(position,ratio);for(const b of Object.values(r)){assert.ok(b.x>=10&&b.y>=10&&b.w>0&&b.h>0);assert.ok(b.x+b.w<=360&&b.y+b.h<=310)}const a=r.text,b=r.character;assert.ok(a.x>=b.x+b.w||a.y>=b.y+b.h||b.x>=a.x+a.w||b.y>=a.y+a.h)}
+const long='一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十';assert.equal(Options.wrap({measureText:s=>({width:Array.from(s).length*10})},long,90).join(''),long);
+promptState.textMode='web';promptState.design.textPosition='top';prompt=vm.runInContext('promptFor(batches()[0])',ctx);assert.ok(prompt.includes('每格只畫無字角色'));assert.ok(prompt.includes('文字置於上方約 25%'));assert.ok(!prompt.includes('【文字設計】'));
+console.log('PASS: mother sheet geometry, style inheritance, exact phrases, blank text, placement, long text wrapping, no-text mode');
