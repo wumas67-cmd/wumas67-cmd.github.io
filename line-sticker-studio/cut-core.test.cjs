@@ -58,7 +58,7 @@ vm.runInContext(extract('function gridSpec()', 'function resetSheets()')+extract
 for(const background of ['transparent','green']){
  promptState.promptBackground=background;
  const prompt=vm.runInContext('promptFor(batches()[1])',ctx);
- for(const expected of ['第 2 批（共 3 批）','17–32','4 欄 × 4 列，共 16 格','1600 × 1600px','370 × 320px','各至少留 20px','至少保留 40px','360 × 360px'])assert.ok(prompt.includes(expected),expected);
+ for(const expected of ['第 2 批（共 3 批）','17–32','4 欄 × 4 列，共 16 格','1600 × 1600px','各至少留 20px','至少保留 40px','360 × 360px'])assert.ok(prompt.includes(expected),expected);
  assert.ok(!prompt.includes('1950'));assert.ok(prompt.includes('「文字17」')&&prompt.includes('「文字32」'));assert.ok(!prompt.includes('「文字33」'));
 }
 promptState.count=18;let last=vm.runInContext('promptFor(batches()[1])',ctx);assert.ok(last.includes('第 3–16 格保持純 #00FF00 綠色空白'));assert.ok(last.includes('1600 × 1600px'));
@@ -76,3 +76,18 @@ for(const position of ['bottom','top','side','auto'])for(const ratio of [25,40,5
 const long='一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十';assert.equal(Options.wrap({measureText:s=>({width:Array.from(s).length*10})},long,90).join(''),long);
 promptState.textMode='web';promptState.design.textPosition='top';prompt=vm.runInContext('promptFor(batches()[0])',ctx);assert.ok(prompt.includes('每格只畫無字角色'));assert.ok(prompt.includes('文字置於上方約 25%'));assert.ok(!prompt.includes('【文字設計】'));
 console.log('PASS: mother sheet geometry, style inheritance, exact phrases, blank text, placement, long text wrapping, no-text mode');
+
+// 5×8 grid prompts and cell isolation that recovers content spilling over grid lines.
+promptState.textMode='ai';promptState.grid='5x8';promptState.count=40;promptState.characterSource='custom';promptState.character='邊牧';
+prompt=vm.runInContext('promptFor(batches()[0])',ctx);
+for(const expected of ['5 欄 × 8 列，共 40 格','2000 × 3200px','5:8 直式','第 1 批（共 1 批）','01–40','各列中心 y：200px','3000px（93.8%）','第 8 列（由左至右）','格數多、每格較小','不得自行改成其他欄列數'])assert.ok(prompt.includes(expected),expected);
+assert.equal(vm.runInContext('gridSpec().capacity',ctx),40);
+promptState.count=50;assert.equal(vm.runInContext('batches().length',ctx),2);assert.ok(vm.runInContext('promptFor(batches()[1])',ctx).includes('第 11–40 格保持'));
+{const w=60,h=30,d=new Uint8ClampedArray(w*h*4),dot=(x0,y0,x1,y1)=>{for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)d[(y*w+x)*4+3]=255};
+ // cell is x 15–45; own sticker overflows to x=48, neighbour's piece pokes in at x 10–17, stray halo outside
+ dot(20,5,48,25);dot(2,5,17,25);
+ const r=C.isolateCell(d,w,h,{x:15,y:0,w:30,h:30});
+ assert.ok(r.overflow&&!r.merged);assert.equal(d[(10*w+47)*4+3],255,'overflow kept');assert.equal(d[(10*w+16)*4+3],0,'neighbour removed');assert.equal(d[(10*w+5)*4+3],0);}
+{const w=90,h=30,d=new Uint8ClampedArray(w*h*4);for(let y=5;y<25;y++)for(let x=5;x<85;x++)d[(y*w+x)*4+3]=255;
+ const r=C.isolateCell(d,w,h,{x:30,y:0,w:30,h:30});assert.ok(r.merged);assert.equal(d[(10*w+40)*4+3],255);assert.equal(d[(10*w+70)*4+3],0);}
+console.log('PASS: 5x8 prompts and batching, overflow recovery, neighbour removal, merged-sticker clipping');

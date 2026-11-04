@@ -89,6 +89,33 @@ function gridBounds(data,w,h,cols,rows){
  }
  return {boxes,edgeCells};
 }
-const api={background,mask,flatMask,despill,detect,STICKER,sheetLayout,alphaBounds,fitRect,gridBounds};if(typeof module!=='undefined')module.exports=api;else root.CutCore=api;
+
+// 依格位隔離單張貼圖：region 比格子大一圈，先找出所有相連的可見區塊，
+// 重心落在本格的區塊整個保留（補回超出格線的手腳、文字），重心在隔壁格的移除；
+// 兩張貼圖黏在一起時，只保留本格範圍內的部分。
+function isolateCell(data,w,h,cell,alphaMin=24,open={}){
+ const n=w*h,label=new Int32Array(n).fill(-1),stack=new Int32Array(n),comps=[];
+ const inCell=(x,y)=>x>=cell.x&&x<cell.x+cell.w&&y>=cell.y&&y<cell.y+cell.h;
+ for(let i=0;i<n;i++){
+  if(label[i]!==-1||data[i*4+3]<alphaMin)continue;
+  const id=comps.length;let sp=0,area=0,inside=0,sx=0,sy=0,minx=w,miny=h,maxx=0,maxy=0;stack[sp++]=i;label[i]=id;
+  while(sp){const p=stack[--sp],x=p%w,y=(p-x)/w;area++;sx+=x;sy+=y;if(inCell(x,y))inside++;if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;
+   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const q=ny*w+nx;if(label[q]===-1&&data[q*4+3]>=alphaMin){label[q]=id;stack[sp++]=q}}}
+  comps.push({area,inside,cx:sx/area,cy:sy/area,minx,miny,maxx,maxy});
+ }
+ let overflow=false,merged=false;
+ const rule=comps.map(c=>{
+  const huge=(c.maxx-c.minx+1)>cell.w*1.6||(c.maxy-c.miny+1)>cell.h*1.6||(open.l&&c.minx===0)||(open.t&&c.miny===0)||(open.r&&c.maxx===w-1)||(open.b&&c.maxy===h-1);
+  if(inCell(c.cx,c.cy)){if(huge){merged=true;return 'clip'}if(c.inside<c.area)overflow=true;return 'keep'}
+  if(c.inside/c.area>.35&&c.area>cell.w*cell.h*.02){merged=true;return 'clip'}
+  return 'drop';
+ });
+ for(let i=0;i<n;i++){const x=i%w,y=(i-x)/w,id=label[i];
+  if(id<0){if(data[i*4+3]>0&&!inCell(x,y))data[i*4+3]=0;continue}
+  const r=rule[id];if(r==='drop'||(r==='clip'&&!inCell(x,y)))data[i*4+3]=0;
+ }
+ return {overflow,merged};
+}
+const api={isolateCell,background,mask,flatMask,despill,detect,STICKER,sheetLayout,alphaBounds,fitRect,gridBounds};if(typeof module!=='undefined')module.exports=api;else root.CutCore=api;
 })(typeof window!=='undefined'?window:this);
 
