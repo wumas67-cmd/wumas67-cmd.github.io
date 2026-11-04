@@ -9,11 +9,11 @@ const currentCategory=CATEGORY_BY_ID[saved.category]?saved.category:'daily';
 const MAX_STICKERS=40;const initialTexts=Array.isArray(saved.texts)?saved.texts.slice(0,MAX_STICKERS):Array.isArray(drafts[currentCategory])?drafts[currentCategory].slice(0,MAX_STICKERS):[...CATEGORY_BY_ID[currentCategory].phrases];
 const designDefaults={textRatio:'25',fontStyle:'natural',textPosition:'bottom',fontColorPreset:'auto',customFontColor:'#ff6b54',designBackground:'transparent',designBgColor:'#fcebdc',textStroke:'dark',customFont:''};
 const design={...designDefaults,...(saved.design||{})};
-const state={design,palette:saved.palette||'柔和粉嫩',grid:['4x4','5x4','5x8'].includes(saved.grid)?saved.grid:'5x4',promptBackground:saved.promptBackground==='green'?'green':'transparent',count:clamp(saved.count||20,1,MAX_STICKERS),category:currentCategory,drafts,texts:initialTexts,character:saved.character||'可愛的黑白邊牧',characterSource:['reference','reference-style'].includes(saved.characterSource)?saved.characterSource:'custom',characterColor:StudioOptions.tones[saved.characterColor]?saved.characterColor:'auto',characterColorCustom:/^#[0-9a-f]{6}$/i.test(saved.characterColorCustom||'')?saved.characterColorCustom:'#f7a8a0',characterColorName:String(saved.characterColorName||'').slice(0,20),toneScope:['outfit','whole','accent'].includes(saved.toneScope)?saved.toneScope:'outfit',referenceImage:null,style:saved.style||'童趣手繪貼紙風',textMode:saved.textMode||'ai',sheets:{},results:[],main:0,tab:0,step:1,focused:0,targeting:false};
+const state={design,palette:saved.palette||'柔和粉嫩',grid:saved.grid==='4x4'?'4x4':'5x4',promptBackground:saved.promptBackground==='green'?'green':'transparent',count:clamp(saved.count||20,1,MAX_STICKERS),category:currentCategory,drafts,texts:initialTexts,character:saved.character||'可愛的黑白邊牧',characterSource:['reference','reference-style'].includes(saved.characterSource)?saved.characterSource:'custom',characterColor:StudioOptions.tones[saved.characterColor]?saved.characterColor:'auto',characterColorCustom:/^#[0-9a-f]{6}$/i.test(saved.characterColorCustom||'')?saved.characterColorCustom:'#f7a8a0',characterColorName:String(saved.characterColorName||'').slice(0,20),toneScope:['outfit','whole','accent'].includes(saved.toneScope)?saved.toneScope:'outfit',referenceImage:null,style:saved.style||'童趣手繪貼紙風',textMode:saved.textMode||'ai',sheets:{},results:[],main:0,tab:0,step:1,focused:0,targeting:false};
 while(state.texts.length<MAX_STICKERS)state.texts.push('');
 const persist=()=>{try{localStorage.setItem('sticker-studio-v1',JSON.stringify({palette:state.palette,grid:state.grid,promptBackground:state.promptBackground,count:state.count,category:state.category,drafts:state.drafts,texts:state.texts,design:state.design,character:state.character,characterSource:state.characterSource,characterColor:state.characterColor,characterColorCustom:state.characterColorCustom,characterColorName:state.characterColorName,toneScope:state.toneScope,style:state.style,textMode:state.textMode}))}catch{}};
 let toastTimer;function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
-function gridSpec(){const [cols,rows]=({'4x4':[4,4],'5x4':[5,4],'5x8':[5,8]})[state.grid]||[5,4];return {cols,rows,capacity:cols*rows}}
+function gridSpec(){const [cols,rows]=({'4x4':[4,4],'5x4':[5,4]})[state.grid]||[5,4];return {cols,rows,capacity:cols*rows}}
 function batches(){const {capacity}=gridSpec();return Array.from({length:Math.ceil(state.count/capacity)},(_,i)=>({index:i,start:i*capacity,size:Math.min(capacity,state.count-i*capacity)}))}
 function resetSheets(){generation++;Object.values(state.sheets).forEach(s=>s.bitmap.close());state.sheets={};state.results=[];renderUploads();renderResults()}
 function setCount(value){const n=clamp(value,1,MAX_STICKERS);state.count=n;$('#count').value=n;$('#countNumber').value=n;$('#countValue').textContent=n;renderEditors();renderPresets();persist();renderPrompts();renderUploads();if(Object.keys(state.sheets).length)queueProcess();else renderResults()}
@@ -40,46 +40,34 @@ let previewFrame=0;function renderDesignPreview(){cancelAnimationFrame(previewFr
 function drawDesignPreview(){const d=state.design,box=$('#designPreview'),f=StudioOptions.fonts[d.fontStyle]||StudioOptions.fonts.natural;let cv=box.querySelector('canvas');if(!cv){box.replaceChildren();cv=document.createElement('canvas');cv.width=370;cv.height=320;cv.setAttribute('role','img');box.append(cv)}const text=state.texts[state.focused]?.trim()||state.texts.find(x=>x?.trim())||'早安！';cv.setAttribute('aria-label',`貼圖預覽：${text}`);const ctx=cv.getContext('2d'),r=StudioOptions.regions(d.textPosition,d.textRatio);ctx.clearRect(0,0,cv.width,cv.height);if(d.designBackground==='solid'){ctx.fillStyle=d.designBgColor;ctx.fillRect(10,10,350,300)}StickerText.placeholder(ctx,r.character,characterTone());StickerText.draw(ctx,text,r.text,{style:d.fontStyle,fill:textFill(),stroke:d.textStroke});$('#fontDescription').textContent=d.fontStyle==='custom'?(d.customFont||'在自訂字體描述欄位輸入想要的筆觸與造型。'):f.description;$('#positionDescription').textContent=positionDescription()+'。網頁疊字的「自動」使用下方獨立文字區，避免遮臉。';box.dataset.position=d.textPosition||'bottom';StickerText.ensure(d.fontStyle,text+state.texts.slice(0,state.count).join('')).then(fresh=>{if(!fresh)return;renderDesignPreview();if($('#overlay').checked&&Object.keys(state.sheets).length)queueProcess()})}
 function go(step){state.step=step;for(let i=1;i<=3;i++){$(`#step${i}`).classList.toggle('hidden',i!==step)}$$('.step').forEach(b=>b.classList.toggle('active',Number(b.dataset.step)===step));if(step===2)renderPrompts();if(step===3){renderUploads();renderResults();if($('#cutCols')){$('#cutCols').value=gridSpec().cols;$('#cutRows').value=gridSpec().rows}const bg=$('#cutBg');if(bg){bg.value=state.promptBackground==='transparent'?'keep':'green';bg.dispatchEvent(new Event('change'))}}window.scrollTo({top:0,behavior:'smooth'})}
 function promptFor(batch){
- const {cols,rows,capacity}=gridSpec(),transparent=state.promptBackground==='transparent',layout=StudioOptions.motherLayout(cols,rows),keepStyle=state.characterSource==='reference-style',tone=toneDescription();
- const g=(a,b)=>b?g(b,a%b):a,d=g(layout.width,layout.height),ratio=`${layout.width/d}:${layout.height/d}`,orient=layout.width>layout.height?'橫式':layout.width<layout.height?'直式':'正方形';
- const pct=(i,n)=>`${Math.round((i+.5)/n*1000)/10}%`;
- const xs=Array.from({length:cols},(_,i)=>`${200+i*400}px（${pct(i,cols)}）`).join('、'),ys=Array.from({length:rows},(_,i)=>`${200+i*400}px（${pct(i,rows)}）`).join('、');
- const items=state.texts.slice(batch.start,batch.start+batch.size).map((s,i)=>`${i+1}. ${s.trim()?`「${s}」`:'（此格只畫角色，不顯示任何文字）'}`);
- const phrases=Array.from({length:Math.ceil(items.length/cols)},(_,r)=>`第 ${r+1} 列（由左至右）：\n${items.slice(r*cols,r*cols+cols).join('\n')}`).join('\n');
- const empty=batch.size<capacity?`第 ${batch.size+1}–${capacity} 格保持${transparent?'完全透明':'純 #00FF00 綠色'}空白，不放角色或文字。`:'';
- const dense=capacity>=32?`\n格數多、每格較小：角色以大頭或半身為主，動作收在格內；文字粗大簡短，避免細小裝飾與複雜背景物件。`:'';
- const role=state.characterSource!=='custom'?'以一同上傳的角色參考圖為準，保留角色身分、臉型外觀與辨識特徵，維持同一個角色；動作與表情可以改變。請將參考圖與本提示詞一起提供給生圖工具。':`本次無母圖。依文字描述建立同一個原創角色：${state.character.trim()||'可愛原創角色'}。`;
- const style=keepStyle?'沿用角色參考圖的人物畫風、材質與原有配色，不額外套用其他畫風；不沿用原圖的背景、文字或裝飾。':tone?`角色畫風採用「${state.style}」插畫風格；「${state.palette}」只用於整體光影氛圍與小裝飾，角色配色以上方主角色調的規則為準。`:`角色畫風採用「${state.style}」插畫風格與「${state.palette}」配色。${state.characterSource==='reference'?'保留參考角色本身的辨識配色；所選配色只用於整體氛圍與配件。':''}`;
- const bg=transparent?'透明背景 PNG，所有主體外部及物件之間的空隙皆透明；必須具有真正的 Alpha 透明通道，不要畫棋盤格假透明。':'純 #00FF00 綠色，無漸層、陰影、雜點；所有主體外部及物件之間的空隙均為純綠色。主體與文字避免使用接近 #00FF00 的綠色。';
- const textRules=state.textMode==='web'?'':'每格文字須與清單完全相同；禁止自動加字、增刪字、改字、補上標點或加入 emoji。空文字格只畫角色，不得把說明文字畫上去。';
- return `請生成一張 LINE 靜態貼圖母圖：${cols} 欄 × ${rows} 列、共 ${capacity} 格的貼圖排版，一次輸出完整一張。
-
-【最重要的規則（依優先順序）】
-1. 網格：整張畫布平均分成 ${cols} 欄 × ${rows} 列，格子填滿整張畫布；四周不留外框、標題列或空白邊，不得自行改成其他欄列數。
-2. 不跨格：每張貼圖的角色、文字、描邊與所有效果，都只能畫在所屬格子中央 360 × 360px 內；格子四邊各至少留 20px 空白，相鄰兩張貼圖的可見內容至少保留 40px 間距，不能相碰、重疊或伸進隔壁格。寧可把角色畫小一點，也不要碰到格子邊緣。
-3. 完整：每張貼圖的角色頭頂、耳朵、手腳、尾巴與文字都要完整出現在格內，不可被格子邊緣裁切。${textRules?'\n4. 文字：'+textRules:''}
-
-【畫布與格位】
-總畫布：${layout.width} × ${layout.height}px（${ratio} ${orient}）；排列：${cols} 欄 × ${rows} 列，共 ${capacity} 格；每格 400 × 400px。
-各欄中心 x：${xs}。
-各列中心 y：${ys}。
-每張貼圖的中心對準所屬格子的中心。格子只是不可見的切圖定位區，成品不得畫出任何格線、格框、分隔線、導引線、面板邊框或編號。
-若生圖工具無法輸出此尺寸，請改用最接近的比例，仍把 ${cols} × ${rows} 網格平均分配到整張畫布（格子可略為不正方），每格四邊仍留約 5% 空白；不可縮小留白。${dense}
-本批是第 ${batch.index+1} 批（共 ${batches().length} 批），對應貼圖編號 ${String(batch.start+1).padStart(2,'0')}–${batch.start+batch.size}。
+ const {cols,rows,capacity}=gridSpec(),transparent=state.promptBackground==='transparent',layout=StudioOptions.motherLayout(cols,rows),keepStyle=state.characterSource==='reference-style';
+ const phrases=state.texts.slice(batch.start,batch.start+batch.size).map((s,i)=>`${i+1}. ${s.trim()?`「${s}」`:'（此格只畫角色，不顯示任何文字）'}`).join('\n');
+ const role=state.characterSource!=='custom'?'以一同上傳的角色參考圖為準，保留角色身分、臉型外觀、配色與辨識特徵，維持同一個角色；動作與表情可以改變。請將參考圖與本提示詞一起提供給生圖工具。':`本次無母圖。依文字描述建立同一個原創角色：${state.character.trim()||'可愛原創角色'}。`;
+ const style=keepStyle?'沿用角色參考圖的人物畫風、材質與原有配色，不額外套用其他畫風；不沿用原圖的背景、文字或裝飾。':`角色畫風採用「${state.style}」插畫風格與「${state.palette}」配色，不要被母圖的其他裝飾限制。${state.characterSource==='reference'?'保留參考角色本身的辨識配色；所選配色用於整體氛圍與配件。':''}`;
+ const bg=transparent?'透明背景 PNG，所有主體外部及物件之間的空隙皆透明；必須具有真正的 Alpha 透明通道，不要畫棋盤格假透明。':'純 #00FF00 綠色，無漸層、陰影、雜點；所有主體外部及物件之間的空隙均為純綠色。避免主體、文字使用接近 #00FF00 的綠色，方便後續去背。';
+ return `請生成一張 LINE 靜態貼圖母圖，嚴格遵守下列要求。
 
 【角色與畫風】
-${role}${tone?'\n'+tone:''}
+${role}${toneDescription()?'\n'+toneDescription():''}
 ${style}
-本批 ${batch.size} 張貼圖為同一角色，不新增其他角色；每格表情、姿態與動作配合該格句子變化，避免同一張臉重複排列。角色外觀、比例、服裝與配色必須一致。
+本批 ${batch.size} 張貼圖為同一角色，不新增其他角色；每格表情、姿態與動作應配合該格句子變化，避免只是同一張臉重複排列。角色外觀、比例、服裝與配色必須一致。
 
-【每格內容】（序號只供定位，不得畫出）
-${phrases}${empty?'\n'+empty:''}
-${state.textMode==='web'?`每格只畫無字角色，不加入文字、標點或對話框。網頁加字預留區：${positionDescription()}；自動位置時預留下方獨立文字區。`:`\n${designDescription()}`}
+【畫布與格數】
+總畫布：${layout.width} × ${layout.height}px；排列：${cols} 欄 × ${rows} 列，共 ${capacity} 格；每格 400 × 400px。
+這 ${capacity} 格只是不可見的切圖定位區，成品不得畫出任何格線、格框、分隔線、導引線、面板邊框或編號。
+每格上、下、左、右各至少留 20px 無主體安全區；角色、文字、描邊與所有效果及裝飾均不得侵入。可見內容限制於每格中央 360 × 360px 內；相鄰格可見主體之間至少保留 40px。
+請生成 ${batch.size} 張獨立 LINE 貼圖，這是第 ${batch.index+1} 批（共 ${batches().length} 批），對應貼圖編號 ${String(batch.start+1).padStart(2,'0')}–${batch.start+batch.size}。
 
-【背景與輸出】
+${state.textMode==='web'?`情境參考（不繪製文字）：\n${phrases}\n每格只畫無字角色，不加入文字、標點或對話框。網頁加字預留區：${positionDescription()}；自動位置時預留下方獨立文字區。`:`貼圖文字（以下序號只供定位，不得畫出）：\n${phrases}\n\n${designDescription()}\n每格文字須與指定內容完全相同；禁止自動加字、增刪字、改字、補上標點或加入 emoji。空文字格只畫角色，不得把說明文字畫上去。`}
+
+【排列與切割】
+請以橫向 ${cols} 格、直向 ${rows} 格（${cols} × ${rows}）的網格，由左至右、由上至下按文字順序整齊排列，每格最多一張貼圖。${batch.size<capacity?`第 ${batch.size+1}–${capacity} 格保持${transparent?'完全透明':'純 #00FF00 綠色'}空白，不放角色或文字。`:''}
+每格安全距離至少 5%（20px）；文字、對話框及裝飾須靠近所屬角色，不能接觸、跨格或重疊。人物完整不裁切，手指與四肢正確。不得自行改成其他欄列。
+若生圖工具不支援指定尺寸，請維持相同長寬比，等比例放大格位及安全距離；不可縮小留白。切割後由工作室將整組內容等比例縮放至最大 370 × 320px 的獨立成品，並保留四邊至少 10px 透明留白；不要把成品尺寸當成母圖格位尺寸。
+
+【背景與成品安全】
 背景：${bg}不要加入整張圖共用的底板、邊框或大型裝飾。
-角色與裝飾保留自然輪廓，不加白色貼紙外框、白色底板、白色光暈、外發光或投影；角色本身的白色毛髮、衣服及物件原有白色必須保留。${state.textMode==='ai'&&state.design.textStroke==='white'?'只有文字可使用上方指定的白色描邊。':'不添加白色描邊。'}不要浮水印、簽名或額外文字。
-必須一次輸出完整 ${cols} × ${rows} 母圖，不是單張貼圖、九宮格、教學表或帶外框的展示稿。`;
+角色、文字及任何效果不得超出各自 400 × 400px 的不可見格位。角色與裝飾保留自然輪廓，不加白色貼紙外框、白色底板、白色光暈、外發光或投影；角色本身的白色毛髮、衣服及物件原有白色必須保留。${state.textMode==='ai'&&state.design.textStroke==='white'?'只有文字可使用上方指定的白色描邊。':'不添加白色描邊。'}不要浮水印、簽名或額外文字。必須一次輸出完整 ${cols} × ${rows} 母圖，不是單張貼圖、九宮格、教學表或帶外框的展示稿。`;
 }
 function renderPrompts(){const bs=batches(),{cols,rows}=gridSpec(),layout=StudioOptions.motherLayout(cols,rows);const spec=$('#layoutSpec');if(spec)spec.textContent=`目前排列：${cols} 欄 × ${rows} 列｜母圖 ${layout.width} × ${layout.height}px｜每格 400 × 400px｜格內四邊各留 20px｜相鄰可見內容至少相距 40px。獨立成品最大 370 × 320px、四邊至少留白 10px。`; $('#batchCount').textContent=`${bs.length} 批 · ${state.count} 則`;const el=$('#prompts');el.replaceChildren();bs.forEach(b=>{const card=document.createElement('article');card.className='prompt-card';const title=document.createElement('div');title.className='prompt-title';const left=document.createElement('div');const strong=document.createElement('strong');strong.textContent=`第 ${b.index+1} 批 · 貼圖 ${b.start+1}–${b.start+b.size}`;const caption=document.createElement('span');caption.textContent=` · ${b.size} 則文字`;left.append(strong,caption);const button=document.createElement('button');button.type='button';button.textContent='複製提示詞';button.onclick=async()=>{try{await navigator.clipboard.writeText(promptFor(b));toast(`已複製第 ${b.index+1} 批提示詞`)}catch{area.select();document.execCommand('copy');toast('已複製提示詞')}};title.append(left,button);const area=document.createElement('textarea');area.readOnly=true;area.value=promptFor(b);area.setAttribute('aria-label',`第 ${b.index+1} 批提示詞`);card.append(title,area);el.append(card)})}
 function renderUploads(){const el=$('#uploadRows');el.replaceChildren();batches().forEach(b=>{const row=document.createElement('div');row.className='upload-row';const info=document.createElement('div');const name=document.createElement('b');name.textContent=`第 ${b.index+1} 批 · 第 ${b.start+1}–${b.start+b.size} 張`;const detail=document.createElement('small');detail.textContent=`上傳一張 ${gridSpec().cols} × 4 ${state.promptBackground==='transparent'?'透明 PNG':'純綠幕圖'}`;info.append(name,detail);const fn=document.createElement('span');fn.className='file-name';fn.textContent=state.sheets[b.index]?.name||'尚未選擇圖片';const label=document.createElement('label');label.textContent='選擇圖片';const inp=document.createElement('input');inp.type='file';inp.accept='image/png,image/jpeg,image/webp';inp.setAttribute('aria-label',`上傳第 ${b.index+1} 批圖片`);inp.onchange=async()=>{const file=inp.files[0];if(!file)return;try{const bitmap=await createImageBitmap(file);state.sheets[b.index]?.bitmap.close();state.sheets[b.index]={name:file.name,bitmap};{const {cols,rows}=gridSpec(),want=cols/rows,got=bitmap.width/bitmap.height;if(Math.abs(got/want-1)>.12)toast(`這張圖長寬比 ${got.toFixed(2)}，和 ${cols} × ${rows} 母圖應有的 ${want.toFixed(2)} 差距較大，請確認欄列是否正確`)}fn.textContent=file.name;await processAll();toast(state.cutNote?`第 ${b.index+1} 批已處理。${state.cutNote}`:`第 ${b.index+1} 批已處理`)}catch(e){toast(`圖片無法開啟：${e.message}`)}};label.append(inp);row.append(info,fn,label);el.append(row)})}
