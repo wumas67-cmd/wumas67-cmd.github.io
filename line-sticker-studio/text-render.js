@@ -76,6 +76,7 @@ const StickerText = (() => {
   function luminance(hex) { const [r, g, b] = rgb(hex).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4) }); return .2126 * r + .7152 * g + .0722 * b }
   function shade(hex, amt) { const c = rgb(hex).map(v => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt)); return '#' + c.map(v => v.toString(16).padStart(2, '0')).join('') }
   function strokeColor(mode, fill) {
+    if (mode === 'double') return '#2b2b2b';
     if (mode === 'white') return '#ffffff';
     if (mode === 'black') return '#000000';
     if (mode === 'dark') return '#2b2b2b';
@@ -98,17 +99,40 @@ const StickerText = (() => {
 
     // 1. 找出放得下的最大字級
     const m = document.createElement('canvas').getContext('2d');
-    let size = Math.floor(Math.min(76, box.h * .82)), lines = [], ext = 0, lh = 0;
-    for (; size > 8; size--) {
-      m.font = `${look.weight} ${size}px ${fam}`;
-      const sw = strokeOn ? Math.max(2, size * .13) : 0;
-      ext = sw + (look.heavy ? size * .035 * look.heavy : 0) + (look.effect === 'bubble' && strokeOn ? size * .24 : 0) +
-        (['extrude', 'pop', 'shadow'].includes(look.effect) ? size * .11 : 0) + (look.slant ? size * Math.abs(look.slant) * .6 : 0) + (look.jitter ? size * .08 : 0);
-      lh = size * 1.2;
-      lines = wrap(m, value, Math.max(10, box.w - 8 - ext));
-      const widest = Math.max(...lines.map(l => m.measureText(l).width));
-      if (widest + ext <= box.w - 6 && lines.length * lh + ext <= box.h - 4) break;
+    function fit(b) {
+      let size = Math.floor(Math.min(76, b.h * .82)), lines = [], ext = 0, lh = 0, widest = 0;
+      for (; size > 8; size--) {
+        m.font = `${look.weight} ${size}px ${fam}`;
+        const sw = strokeOn ? Math.max(2, size * .13) * (opts.stroke === 'double' ? 1.9 : 1) : 0;
+        ext = sw + (look.heavy ? size * .035 * look.heavy : 0) + (look.effect === 'bubble' && strokeOn ? size * .24 : 0) +
+          (['extrude', 'pop', 'shadow'].includes(look.effect) ? size * .11 : 0) + (look.slant ? size * Math.abs(look.slant) * .6 : 0) + (look.jitter ? size * .08 : 0);
+        lh = size * 1.2;
+        lines = wrap(m, value, Math.max(10, b.w - 8 - ext));
+        widest = Math.max(...lines.map(l => m.measureText(l).width));
+        if (widest + ext <= b.w - 6 && lines.length * lh + ext <= b.h - 4) break;
+      }
+      return { size, lines, ext, lh, widest };
     }
+    let r;
+    if (opts.frame && opts.frame !== 'none') {
+      // 對話框：先在最大可用空間排字，再讓外框剛好包住文字
+      const kind = opts.frame, pos = opts.position || 'bottom', side = pos === 'side';
+      const tail = Math.min(18, Math.max(10, box.h * .16));
+      const maxBody = { x: box.x + 3 + (side ? tail : 0), y: box.y + 3 + (pos === 'bottom' || pos === 'auto' ? tail : 0), w: box.w - 6 - (side ? tail : 0), h: box.h - 6 - (side ? 0 : tail) };
+      const k = kind === 'burst' ? [.8, .68] : kind === 'cloud' ? [.8, .72] : [1, 1];
+      const padFor = sz => [Math.max(8, sz * .5), Math.max(5, sz * .28)];
+      const p0 = padFor(Math.min(maxBody.h * .4, maxBody.w * .22));
+      r = fit({ x: 0, y: 0, w: maxBody.w * k[0] - p0[0] * 2, h: maxBody.h * k[1] - p0[1] * 2 });
+      const [px, py] = padFor(r.size);
+      const iw = r.widest + r.ext + 6, ih = r.lines.length * r.lh + r.ext * .5;
+      const bw = Math.min(maxBody.w, (iw + px * 2) / k[0]), bh = Math.min(maxBody.h, (ih + py * 2) / k[1]);
+      const bx = side ? maxBody.x : maxBody.x + (maxBody.w - bw) / 2;
+      const by = pos === 'top' ? maxBody.y + maxBody.h - bh : side ? maxBody.y + (maxBody.h - bh) / 2 : maxBody.y;
+      const body = { x: bx, y: by, w: bw, h: bh };
+      drawFrame(ctx, kind, body, pos, tail);
+      box = { x: body.x + (bw - bw * k[0]) / 2, y: body.y + (bh - bh * k[1]) / 2, w: bw * k[0], h: bh * k[1] };
+    } else r = fit(box);
+    const { size, lines, lh } = r;
 
     // 2. 在獨立圖層上繪製（像素字先畫小再放大）
     const scale = look.effect === 'pixel' ? Math.max(.22, Math.min(.55, 15 / size)) : 1;
@@ -118,7 +142,7 @@ const StickerText = (() => {
     c.scale(scale, scale);
     c.font = `${look.weight} ${size}px ${fam}`;
     c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round'; c.lineCap = 'round'; c.miterLimit = 2;
-    const sw = strokeOn ? Math.max(2, size * .13) : 0, heavyW = look.heavy ? size * .035 * look.heavy : 0;
+    const dbl = opts.stroke === 'double', sw = strokeOn ? Math.max(2, size * .13) : 0, heavyW = look.heavy ? size * .035 * look.heavy : 0;
     const random = rng(hash(value + opts.style));
     const tilts = Array.from(value).map(() => (random() - .5) * 2 * (look.jitter || 0));
     const bounce = Array.from(value).map(() => (random() - .5) * size * (look.jitter ? .12 : 0));
@@ -159,7 +183,8 @@ const StickerText = (() => {
     if (look.effect === 'shadow') pass({ kind: 'both', dx: size * .06, dy: size * .07, color: 'rgba(0,0,0,.28)' });
     if (look.effect === 'pop') pass({ kind: 'both', dx: size * .1, dy: size * .1, color: strokeOn ? sCol : '#222222' });
     if (look.effect === 'bubble' && strokeOn) pass({ kind: 'stroke', width: sw + heavyW + size * .24, color: sCol });
-    if (strokeOn) pass({ kind: 'stroke', width: sw + heavyW + (look.effect === 'bubble' ? size * .1 : 0), color: look.effect === 'bubble' ? '#ffffff' : sCol });
+    if (dbl) { pass({ kind: 'stroke', width: sw * 2.6 + heavyW, color: sCol }); pass({ kind: 'stroke', width: sw * 1.25 + heavyW, color: '#fff6e0' }) }
+    else if (strokeOn) pass({ kind: 'stroke', width: sw + heavyW + (look.effect === 'bubble' ? size * .1 : 0), color: look.effect === 'bubble' ? '#ffffff' : sCol });
     if (heavyW) pass({ kind: 'stroke', width: heavyW, color: fill });
     pass({ kind: 'fill', color: fill });
     if (look.effect === 'bubble') { c.save(); c.globalCompositeOperation = 'source-atop'; pass({ kind: 'fill', dx: -size * .03, dy: -size * .05, color: 'rgba(255,255,255,.28)' }); c.restore(); }
@@ -175,6 +200,67 @@ const StickerText = (() => {
     ctx.save();
     ctx.imageSmoothingEnabled = scale === 1;
     ctx.drawImage(layer, 0, 0, layer.width, layer.height, 0, 0, layer.width / scale, layer.height / scale);
+    ctx.restore();
+  }
+
+  // ---- 對話框 ----
+  // 在文字區畫出外框，回傳框內可放字的區域；尾巴指向角色
+  function drawFrame(ctx, kind, f, position, tail) {
+    const side = position === 'side', top = position === 'top', cx = f.x + f.w / 2, cy = f.y + f.h / 2;
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = '#2b2b2b'; ctx.fillStyle = '#fffaf0';
+    // 尾巴朝向角色：文字在下方→往上、在上方→往下、在右側→往左
+    const t = side ? [[f.x + 3, cy - tail * .45], [f.x - tail, cy - tail * .1], [f.x + 3, cy + tail * .45]]
+      : top ? [[cx - tail * .55, f.y + f.h - 3], [cx - tail * .15, f.y + f.h + tail], [cx + tail * .5, f.y + f.h - 3]]
+      : [[cx - tail * .5, f.y + 3], [cx - tail * .1, f.y - tail], [cx + tail * .55, f.y + 3]];
+    const tailShape = () => { ctx.beginPath(); ctx.moveTo(...t[0]); ctx.lineTo(...t[1]); ctx.lineTo(...t[2]) };
+    if (kind === 'round' || kind === 'burst') {
+      ctx.fillStyle = kind === 'burst' ? '#fff3c4' : '#fffaf0';
+      tailShape(); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.beginPath();
+      if (kind === 'round') { const r = Math.min(f.h / 2, 20); ctx.roundRect ? ctx.roundRect(f.x, f.y, f.w, f.h, r) : ctx.rect(f.x, f.y, f.w, f.h) }
+      else { const n = Math.max(12, Math.round((f.w + f.h) / 16)); for (let i = 0; i < n * 2; i++) { const a = i / (n * 2) * Math.PI * 2, k = i % 2 ? .8 : 1; ctx.lineTo(cx + Math.cos(a) * f.w / 2 * k, cy + Math.sin(a) * f.h / 2 * k) } ctx.closePath() }
+      ctx.fill(); ctx.stroke();
+      // 蓋掉尾巴與外框相接處的線，讓尾巴和框連成一體
+      ctx.beginPath(); ctx.moveTo(...t[0]); ctx.lineTo(...t[1]); ctx.lineTo(...t[2]); ctx.closePath(); ctx.save(); ctx.clip(); ctx.beginPath();
+      if (kind === 'round') { const r = Math.min(f.h / 2, 20); ctx.roundRect ? ctx.roundRect(f.x + 2, f.y + 2, f.w - 4, f.h - 4, r) : ctx.rect(f.x + 2, f.y + 2, f.w - 4, f.h - 4) } else ctx.ellipse(cx, cy, f.w * .38, f.h * .38, 0, 0, Math.PI * 2);
+      ctx.fill(); ctx.restore(); tailShape(); ctx.stroke();
+    } else if (kind === 'cloud') {
+      const rx = f.w / 2, ry = f.h / 2, n = Math.max(8, Math.round(f.w / 30)), br = Math.min(ry * .42, rx * .3);
+      const bumps = Array.from({ length: n }, (_, i) => { const a = i / n * Math.PI * 2; return [cx + Math.cos(a) * (rx - br), cy + Math.sin(a) * (ry - br)] });
+      for (const [x, y] of bumps) { ctx.beginPath(); ctx.arc(x, y, br, 0, Math.PI * 2); ctx.stroke() }
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx - br * .9, ry - br * .9, 0, 0, Math.PI * 2); ctx.fill();
+      for (const [x, y] of bumps) { ctx.beginPath(); ctx.arc(x, y, br - 1.5, 0, Math.PI * 2); ctx.fill() }
+      const dir = side ? [-1, 0] : top ? [0, 1] : [0, -1], ox = side ? f.x : cx - f.w * .18, oy = side ? cy : top ? f.y + f.h : f.y;
+      for (const [d, rr] of [[tail * .35, Math.max(3, tail * .3)], [tail * .85, Math.max(2, tail * .18)]]) { ctx.beginPath(); ctx.arc(ox + dir[0] * d, oy + dir[1] * d, rr, 0, Math.PI * 2); ctx.fill(); ctx.stroke() }
+    } else if (kind === 'note') {
+      ctx.translate(cx, cy); ctx.rotate(-.04); ctx.fillStyle = '#fff6c9';
+      ctx.beginPath(); ctx.rect(-f.w / 2, -f.h / 2, f.w, f.h); ctx.fill(); ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = 'rgba(235,112,172,.55)'; ctx.fillRect(-Math.min(28, f.w * .14), -f.h / 2 - 6, Math.min(56, f.w * .28), 12);
+    }
+    ctx.restore();
+  }
+
+  // ---- 情緒點綴（漫符） ----
+  function decor(ctx, mood, text, character) {
+    if (!mood || !text) return;
+    const s = Math.max(18, Math.min(44, Math.min(character.w, character.h) * .2));
+    const m = Math.min(character.w, character.h), x = Math.min(character.x + character.w / 2 + m * .44, ctx.canvas.width - s * .8 - 10), y = Math.max(s * .9, character.y + m * .2), c = mood.color;
+    ctx.save(); ctx.translate(x, y); ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = '#2b2b2b'; ctx.lineWidth = Math.max(1.5, s * .06); ctx.fillStyle = c;
+    const heart = (hx, hy, hs) => { ctx.beginPath(); ctx.moveTo(hx, hy + hs * .3); ctx.bezierCurveTo(hx, hy - hs * .1, hx - hs * .55, hy - hs * .15, hx - hs * .5, hy + hs * .2); ctx.bezierCurveTo(hx - hs * .45, hy + hs * .5, hx - hs * .1, hy + hs * .65, hx, hy + hs * .85); ctx.bezierCurveTo(hx + hs * .1, hy + hs * .65, hx + hs * .45, hy + hs * .5, hx + hs * .5, hy + hs * .2); ctx.bezierCurveTo(hx + hs * .55, hy - hs * .15, hx, hy - hs * .1, hx, hy + hs * .3); ctx.fill(); ctx.stroke() };
+    const star = (sx, sy, r) => { ctx.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, k = i % 2 ? .32 : 1; ctx.lineTo(sx + Math.cos(a) * r * k, sy + Math.sin(a) * r * k) } ctx.closePath(); ctx.fill(); ctx.stroke() };
+    const drop = (dx, dy, r) => { ctx.beginPath(); ctx.moveTo(dx, dy - r * 1.4); ctx.quadraticCurveTo(dx + r, dy - r * .1, dx, dy + r * .8); ctx.quadraticCurveTo(dx - r, dy - r * .1, dx, dy - r * 1.4); ctx.fill(); ctx.stroke() };
+    switch (mood.id) {
+      case 'love': heart(0, -s * .45, s); heart(-s * .75, s * .15, s * .5); break;
+      case 'sparkle': star(0, 0, s * .55); star(-s * .7, s * .55, s * .28); break;
+      case 'sweat': drop(0, 0, s * .32); drop(s * .45, s * .55, s * .2); break;
+      case 'sad': drop(-s * .2, 0, s * .26); drop(s * .3, s * .35, s * .26); break;
+      case 'angry': ctx.strokeStyle = c; ctx.lineWidth = s * .14; for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { ctx.beginPath(); ctx.moveTo(a * s * .12, b * s * .45); ctx.quadraticCurveTo(a * s * .12, b * s * .12, a * s * .45, b * s * .12); ctx.stroke() } break;
+      case 'surprise': ctx.strokeStyle = c; ctx.lineWidth = s * .1; for (const a of [-1.9, -1.45, -1]) { ctx.beginPath(); ctx.moveTo(Math.cos(a) * s * .2, Math.sin(a) * s * .2 + s * .4); ctx.lineTo(Math.cos(a) * s * .7, Math.sin(a) * s * .7 + s * .4); ctx.stroke() } break;
+      case 'sleep': ctx.fillStyle = c; ctx.font = `900 ${s * .55}px sans-serif`; ctx.textAlign = 'center'; ctx.lineWidth = 3; for (const [k, dx, dy] of [[1, 0, -s * .2], [.75, -s * .45, s * .25], [.55, -s * .8, s * .6]]) { ctx.font = `900 ${s * .6 * k}px sans-serif`; ctx.strokeText('Z', dx, dy); ctx.fillText('Z', dx, dy) } break;
+      case 'sun': ctx.beginPath(); ctx.arc(0, 0, s * .3, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.strokeStyle = c; ctx.lineWidth = s * .08; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(a) * s * .45, Math.sin(a) * s * .45); ctx.lineTo(Math.cos(a) * s * .62, Math.sin(a) * s * .62); ctx.stroke() } break;
+      case 'music': ctx.beginPath(); ctx.ellipse(-s * .15, s * .3, s * .17, s * .12, -.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-s * .01, s * .28); ctx.lineTo(-s * .01, -s * .45); ctx.quadraticCurveTo(s * .25, -s * .3, s * .3, -s * .05); ctx.stroke(); star(-s * .7, -s * .2, s * .2); break;
+      default: ctx.strokeStyle = c; ctx.lineWidth = s * .1; for (const [a, b, d] of [[-.2, -.5, .3], [.15, -.2, .4], [.2, .2, .3]]) { ctx.beginPath(); ctx.moveTo(a * s, b * s); ctx.lineTo(a * s + d * s, b * s - d * s * .3); ctx.stroke() }
+    }
     ctx.restore();
   }
 
@@ -195,6 +281,6 @@ const StickerText = (() => {
     ctx.restore();
   }
 
-  return { draw, ensure, placeholder, strokeColor, shade };
+  return { draw, ensure, placeholder, decor, strokeColor, shade };
 })();
 if (typeof module !== 'undefined') module.exports = StickerText;
