@@ -58,7 +58,7 @@ ${style}
 每格上、下、左、右各至少留 20px 無主體安全區；角色、文字、描邊與所有效果及裝飾均不得侵入。可見內容限制於每格中央 360 × 360px 內；相鄰格可見主體之間至少保留 40px。
 請生成 ${batch.size} 張獨立 LINE 貼圖，這是第 ${batch.index+1} 批（共 ${batches().length} 批），對應貼圖編號 ${String(batch.start+1).padStart(2,'0')}–${batch.start+batch.size}。
 
-${state.textMode==='web'?`情境參考（不繪製文字）：\n${phrases}\n每格只畫無字角色，不加入文字、標點或對話框。網頁加字預留區：${positionDescription()}；自動位置時預留下方獨立文字區。`:`貼圖文字（以下序號只供定位，不得畫出）：\n${phrases}\n\n${designDescription()}\n每格文字須與指定內容完全相同；禁止自動加字、增刪字、改字、補上標點或加入 emoji。空文字格只畫角色，不得把說明文字畫上去。`}
+${state.textMode==='web'?`情境參考（不繪製文字）：\n${phrases}\n每格只畫無字角色，不加入文字、標點或對話框。網頁加字預留區：${positionDescription()}；自動位置時預留下方獨立文字區。`:`貼圖文字（以下序號只供定位，不得畫出）：\n\n${phrases}\n\n${designDescription()}\n每格文字須與指定內容完全相同；禁止自動加字、增刪字、改字、補上標點或加入 emoji。空文字格只畫角色，不得把說明文字畫上去。`}
 
 【排列與切割】
 請以橫向 ${cols} 格、直向 ${rows} 格（${cols} × ${rows}）的網格，由左至右、由上至下按文字順序整齊排列，每格最多一張貼圖。${batch.size<capacity?`第 ${batch.size+1}–${capacity} 格保持${transparent?'完全透明':'純 #00FF00 綠色'}空白，不放角色或文字。`:''}
