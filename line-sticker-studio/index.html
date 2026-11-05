@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#f7f6f2">
   <meta name="description" content="自訂 1–40 則 LINE 貼圖文字，生成分批提示詞，分割純綠幕合圖並下載透明 PNG。">
   <title>貼圖文字工作室｜自訂 1–40 則文字</title>
-  <link rel="stylesheet" href="style.css?v=20261104-max40">
+  <link rel="stylesheet" href="style.css?v=20261105-copyall">
   <script defer src="categories.js?v=20261101-themes8"></script>
   <script defer src="cut-core.js?v=20261104-grid58"></script>
   <script defer src="studio-options.js?v=20261105-textfx"></script>
   <script defer src="text-render.js?v=20261105-textfx"></script>
-  <script defer src="app.js?v=20261105-grid64"></script>
+  <script defer src="app.js?v=20261105-copyall"></script>
   <link rel="stylesheet" href="splitter.css?v=20261030-options1">
   <script defer src="splitter.js?v=20261104-max40"></script>
   <script defer src="visit-counter.js?v=20261101-visits1"></script>
@@ -36,7 +36,7 @@
       <div class="settings-grid"><label>畫風<select id="style"><option>韓系Q版</option><option>童趣手繪貼紙風</option><option>可愛 Q 版</option><option>3D 公仔</option><option>清新水彩</option><option>扁平插畫</option><option>照片級寫實</option><option>日系 Chibi</option></select></label><label>插畫配色<select id="palette"><option>柔和粉嫩</option><option>清新自然</option><option>鮮明活潑</option><option>復古暖色</option><option>黑白簡約</option><option>依參考圖配色</option></select></label><label>每批排列<select id="grid"><option value="4x4">4 × 4（16 張／批・1:1，所有生圖工具）</option><option value="5x4">5 × 4（20 張／批・5:4，如 Gemini）</option><option value="6x4">6 × 4（24 張／批・3:2，適合 ChatGPT）</option></select></label><label>生圖背景<select id="promptBackground"><option value="green">純 #00FF00 綠幕</option><option value="transparent">透明背景 PNG</option></select></label><label>文字製作方式<select id="textMode"><option value="ai">讓 AI 畫出文字</option><option value="web">只生成無字角色，稍後在網頁加字</option></select></label></div>
       <div class="hint"><strong>無白邊提示詞：</strong>角色不加白色貼紙外框，保留原有白毛；文字依選項加高對比描邊。生圖背景可選純綠幕或真正透明 PNG；若 AI 輸出棋盤格假透明，請改用綠幕重生。生圖工具可能畫錯中文字；若想在網頁自由修改文字，選「只生成無字角色」，第 3 步開啟「疊加網頁文字」。</div>
       <div class="hint"><strong>切割安全版面：</strong><span id="layoutSpec" aria-live="polite">每格 400 × 400px，四邊各留白 20px，相鄰可見內容至少相距 40px。</span> AI 可能未精準遵守，請在第 3 步依格切割並檢查。另可下載獨立成品重新排列的「20px 間距合圖」，它與生圖母圖尺寸不同。</div>
-      <div id="prompts" class="prompt-list"></div>
+      <section id="copyAllBox" class="copy-all" hidden aria-labelledby="copyAllTitle"><div class="copy-all-head"><div><strong id="copyAllTitle">一次複製全部提示詞</strong><p>ChatGPT 可以在同一則訊息裡依序生成多張母圖，不用一批一批貼。</p></div><button type="button" class="primary" id="copyAll">複製全部提示詞</button></div><ol class="copy-all-steps"><li>按「複製全部提示詞」，所有批次會合成一段，開頭已寫好「請分別生成每一組」。</li><li>到 ChatGPT 開新對話；有母圖時先上傳角色參考圖（只要傳一次），再貼上提示詞送出。</li><li>ChatGPT 會依序產生每一組母圖。若只出現一張，回覆「請繼續生成第 2 組」。</li><li>下載每張母圖，到第 3 步依順序上傳：第 1 組放第 1 批、第 2 組放第 2 批。</li></ol><p class="muted">每一組的欄列可能不同（例如 6 × 4 加 4 × 4），請確認每張圖的格數與該批一致。如果合併生成的品質不穩，改用下方各批的「複製提示詞」分開生成。</p></section><div id="prompts" class="prompt-list"></div>
       <div class="panel-footer"><button class="secondary" data-back="1">← 返回文字</button><button class="primary" id="toStep3">下一步：上傳貼圖大圖 <span>→</span></button></div>
     </section>
     <section class="panel hidden" id="step3">
