@@ -4,7 +4,8 @@
 
 - 現場點選／輸入，自動判定合格、計算各項得分與本日得分
 - 各區塊可拍照佐證，照片會放進輸出 Excel 的「照片佐證」工作表
+- 手投藥品查核可拍加藥單，由 AI（Google Gemini 或 Anthropic Claude，使用者自備 API 金鑰）辨識品名、客戶、噸數與藥品，自動填入表單
 - 「輸出 Excel」套用原始查核表範本（已內嵌在 index.html），格式與手填版相同
-- 草稿、設定與每日得分存在使用者自己的瀏覽器（localStorage），不同裝置之間不共用
+- 草稿、設定、AI 金鑰與每日得分存在使用者自己的瀏覽器（localStorage），不同裝置之間不共用
 
 網址：https://wumas67-cmd.github.io/pingtung-qa/
