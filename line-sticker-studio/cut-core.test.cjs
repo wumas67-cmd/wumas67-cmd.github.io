@@ -54,7 +54,7 @@ const extract=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end
 const promptState={grid:'4x4',count:48,texts:Array.from({length:50},(_,i)=>'文字'+(i+1)),characterSource:'reference',style:'童趣手繪貼紙風',palette:'柔和粉嫩',textMode:'ai',design:{textRatio:'25',fontStyle:'natural',fontColorPreset:'auto',textStroke:'auto'}};
 const Options=require('./studio-options.js');
 const ctx=vm.createContext({state:promptState,CutCore:C,StudioOptions:Options});
-vm.runInContext(extract('function gridSpec()', 'function resetSheets()')+extract('const fontLabels=', 'function renderDesignPreview()')+extract('function promptFor(batch)', 'function renderPrompts()'),ctx);
+vm.runInContext(extract('function gridSpec(', 'function resetSheets()')+extract('const fontLabels=', 'function renderDesignPreview()')+extract('function promptFor(batch)', 'function renderPrompts()'),ctx);
 for(const background of ['transparent','green']){
  promptState.promptBackground=background;
  const prompt=vm.runInContext('promptFor(batches()[1])',ctx);
@@ -90,5 +90,7 @@ console.log('PASS: overflow recovery, neighbour removal, merged-sticker clipping
 // 6×4 (3:2) grid and the whole-layout fit rule.
 promptState.textMode='ai';promptState.grid='6x4';promptState.count=40;promptState.characterSource='reference';
 {const p=vm.runInContext('promptFor(batches()[0])',ctx);for(const e of ['2400 × 1600px','6 欄 × 4 列，共 24 格','第 1 批（共 2 批）','01–24','4 列貼圖必須全部完整放進畫布高度','第 4 列（含文字與描邊）底部距離畫布下緣至少 5%','總高度不超過每列高度的 85%'])assert.ok(p.includes(e),e);
- const p2=vm.runInContext('promptFor(batches()[1])',ctx);assert.ok(p2.includes('25–40')&&p2.includes('第 17–24 格保持'));}
-console.log('PASS: 6x4 grid batching and full-layout fit rule');
+ const p2=vm.runInContext('promptFor(batches()[1])',ctx);for(const e of ['25–40','1600 × 1600px','4 欄 × 4 列，共 16 格','4 列貼圖必須全部完整放進'])assert.ok(p2.includes(e),e);assert.ok(!p2.includes('格保持'));
+ promptState.count=32;const p3=vm.runInContext('promptFor(batches()[1])',ctx);assert.ok(p3.includes('第 9–16 格保持')&&p3.includes('不可把畫布裁短'));
+ promptState.grid='5x4';promptState.count=40;assert.equal(vm.runInContext('batches()[1].cols',ctx),5);promptState.count=36;assert.equal(vm.runInContext('batches()[1].cols',ctx),4);}
+console.log('PASS: 6x4 grid batching, 4x4 final batch, blank-cell wording, full-layout fit rule');
