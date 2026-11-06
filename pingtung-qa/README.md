@@ -6,6 +6,14 @@
 - 各區塊可拍照佐證，照片會放進輸出 Excel 的「照片佐證」工作表
 - 手投藥品查核可拍加藥單，由 AI（Google Gemini 或 Anthropic Claude，使用者自備 API 金鑰）辨識品名、客戶、噸數與藥品，自動填入表單
 - 「輸出 Excel」套用原始查核表範本（已內嵌在 index.html），格式與手填版相同
-- 草稿、設定、AI 金鑰與每日得分存在使用者自己的瀏覽器（localStorage），不同裝置之間不共用
+- 可選擇連到 Google 試算表（`gas/Code.gs`）：存檔寫入「每日紀錄」與「查核明細」，輸出的 Excel 備份到雲端硬碟，多支手機共用本月指數
+- 草稿、設定、AI 金鑰存在使用者自己的瀏覽器（localStorage）
+
+## 連接 Google 試算表
+
+1. 新增一個 Google 試算表 → 擴充功能 → Apps Script，貼上 `gas/Code.gs` 全部內容
+2. 把程式最上面的 `TOKEN` 改成自己的密碼，存檔
+3. 部署 → 新增部署作業 → 網頁應用程式；執行身分「我」、存取權「所有人」→ 授權
+4. 複製 `/exec` 結尾的網址，到網頁下方「雲端同步（Google 試算表）」貼上網址與密碼，按「儲存並測試連線」
 
 網址：https://wumas67-cmd.github.io/pingtung-qa/
