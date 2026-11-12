@@ -41,6 +41,7 @@ function doPost(e) {
   try {
     if (body.action === 'save') return out(saveRecord(body.record, body.details || []));
     if (body.action === 'excel') return out(saveExcel(body.date, body.filename, body.data));
+    if (body.action === 'delete') return out(deleteRecord(body.date));
     return out({ ok: false, error: '未知的動作' });
   } finally {
     lock.releaseLock();
@@ -56,14 +57,28 @@ function saveRecord(rec, details) {
   if (row) sh.getRange(row, 1, 1, values[0].length).setValues(values);
   else sh.appendRow(values[0]);
 
+  const dt = deleteDetails(rec.date);
+  if (details.length) dt.getRange(dt.getLastRow() + 1, 1, details.length, DETAIL_HEAD.length).setValues(details);
+  return { ok: true };
+}
+
+// 刪除某一天：每日紀錄那一列與查核明細；雲端硬碟的 Excel 備份保留不動
+function deleteRecord(date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return { ok: false, error: '日期格式錯誤' };
+  const sh = sheet(DAILY, DAILY_HEAD);
+  const row = findRow(sh, date);
+  if (row) sh.deleteRow(row);
+  deleteDetails(date);
+  return { ok: true, found: !!row };
+}
+function deleteDetails(date) {
   const dt = sheet(DETAIL, DETAIL_HEAD);
   const last = dt.getLastRow();
   if (last > 1) {
     const dates = dt.getRange(2, 1, last - 1, 1).getDisplayValues();
-    for (let i = dates.length - 1; i >= 0; i--) if (dates[i][0] === rec.date) dt.deleteRow(i + 2);
+    for (let i = dates.length - 1; i >= 0; i--) if (dates[i][0] === date) dt.deleteRow(i + 2);
   }
-  if (details.length) dt.getRange(dt.getLastRow() + 1, 1, details.length, DETAIL_HEAD.length).setValues(details);
-  return { ok: true };
+  return dt;
 }
 
 function saveExcel(date, filename, b64) {
