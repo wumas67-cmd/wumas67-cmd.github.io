@@ -732,6 +732,12 @@ async function initDB(){ try{ if(window.claude?.use){ DB=await window.claude.use
 function recordOf(){ const {total,max}=scoreAll(); const {photos,_sample,...form}=S; return {date:S.date,month:S.date.slice(0,7),score:+total.toFixed(2),total:max,form:JSON.stringify(form),savedAt:new Date().toISOString()}; }
 /* Google Sheet backend (Apps Script web app) */
 let CLOUD=Object.assign({url:"",token:""}, lsGet("qa-cloud")||{});
+/* dachanqa-report 網址：資料庫已搬到 QA大成（dachan.qa@gmail.com）的試算表。
+   沒設定過、或還連著舊資料庫的裝置，自動換成新網址；密碼不放在網頁裡，請使用者輸入一次。 */
+const GAS_OLD="https://script.google.com/macros/s/AKfycbwNcGzYWoEaRvuL6l87p8ufWAk9ADoZXkV2yEDCk6OO2vGh4c4x2MT0aWI4dh2vfj7cZQ/exec";
+const GAS_DQ ="https://script.google.com/macros/s/AKfycbzZAgJFi27iXlBSXPjoRx1Woa7GhFowFb0d4YBEpItRc73fOz9f5xsTwfA-JVnitJ_CHg/exec";
+const IS_DQ_SITE = /^dachanqa-report\.github\.io$/i.test(location.hostname);
+if(IS_DQ_SITE && (!CLOUD.url || CLOUD.url===GAS_OLD)){ CLOUD={url:GAS_DQ, token:""}; lsSet("qa-cloud",CLOUD); }
 async function gasGet(params){
   const u=new URL(CLOUD.url); Object.entries({...params,token:CLOUD.token}).forEach(([k,v])=>u.searchParams.set(k,v));
   const r=await fetch(u,{redirect:"follow"}); const j=await r.json(); if(!j.ok) throw new Error(j.error||"雲端回傳錯誤"); return j;
@@ -961,7 +967,7 @@ $("#exp-btn").onclick=async()=>{
     const st=Object.assign(blankState(d), JSON.parse(rec.form), {date:d, photos:[]});
     const keepS=S, keepM=MONTH; S=st; MONTH=await monthRecords(d.slice(0,7));
     let blob; try{ blob=await buildXlsx(); } finally { S=keepS; MONTH=keepM; }
-    await saveBlob(blob, `線上品保查核表${rocDate(d).replace(/\//g,"")}.xlsx`);
+    await saveBlob(blob, `屏東廠線上品保查核表${rocDate(d).replace(/\//g,"")}.xlsx`);
   }catch(e){ flash("匯出失敗："+(e.message||e)); }
   btn.disabled=false; btn.textContent="匯出 Excel";
 };
@@ -1090,7 +1096,7 @@ $("#btn-export").onclick=async()=>{
   const btn=$("#btn-export"); btn.disabled=true; btn.textContent="產生中…";
   try{
     const saved = S._sample ? null : await saveRecord();
-    const blob=await buildXlsx(); const [y,m,d]=S.date.split("-"); const name=`線上品保查核表${+y-1911}${m}${d}.xlsx`;
+    const blob=await buildXlsx(); const [y,m,d]=S.date.split("-"); const name=`屏東廠線上品保查核表${+y-1911}${m}${d}.xlsx`;
     if(CLOUD.url && saved && saved!=="fail") backupExcel(blob,name);
     let dl=null; try{ if(window.claude?.use) dl=await window.claude.use("downloads"); }catch(e){}
     if(dl){ try{ await dl.save({filename:name,data:blob}); flash("Excel 已輸出"); }catch(e){ flash(e?.code==="declined"?"已取消下載":"這個畫面無法下載檔案，請改用電腦開啟"); } }
@@ -1105,7 +1111,10 @@ async function backupExcel(blob,name){
   catch(e){ setTimeout(()=>flash("Excel 已輸出，但雲端硬碟備份失敗："+cloudErr(e)),1500); }
 }
 function refreshCloud(){ $("#cloud-url").value=CLOUD.url; $("#cloud-token").value=CLOUD.token;
-  $("#cloud-mode").textContent = CLOUD.url ? "已設定雲端同步。" : "尚未設定：存檔只會留在這台裝置。"; }
+  const needPw = CLOUD.url && !CLOUD.token;
+  $("#cloud-mode").textContent = needPw ? "資料庫已搬到 QA大成 的 Google 試算表：網址已自動填好，請在下面輸入同步密碼，再按「儲存並測試連線」。"
+    : CLOUD.url ? "已設定雲端同步。" : "尚未設定：存檔只會留在這台裝置。";
+  if(needPw){ $("#cloud-box").open=true; } }
 $("#cloud-save").onclick=async()=>{
   const url=$("#cloud-url").value.trim(), token=$("#cloud-token").value.trim();
   if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)){ $("#cloud-mode").textContent="網址格式不對：應該是 https://script.google.com/macros/s/…/exec"; return; }
